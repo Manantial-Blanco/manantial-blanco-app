@@ -7,6 +7,11 @@
 @tailwind utilities;
 
 @layer base {
+  /**
+   * Tailwind CSS theme
+   * tailwind.config.ts expects the following color variables to be expressed as HSL values.
+   * A different format will require also updating the theme in tailwind.config.ts.
+  */
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 0%;
@@ -46,7 +51,12 @@
 }
 
 @layer base {
+  * {
+    @apply border-border;
+  }
+
   body {
+    @apply bg-background text-foreground;
     font-family:
       -apple-system, "SF Compact Display", "Roboto", "Helvetica", sans-serif;
   }
