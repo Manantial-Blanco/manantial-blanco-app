@@ -112,11 +112,19 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
           line-height: 20px;
           letter-spacing: 0%;
         }
+          .promo-banner-text {
+            font-family: 'SF Compact Display', sans-serif;
+            font-weight: 500;
+            font-size: 13px;
+            line-height: 16px;
+            letter-spacing: 0;
+            text-align: center;
+          }
       `}</style>
       {/* Promo Banner */}
       {showBanner && (
-        <div className="relative flex items-center justify-center bg-accent px-4 sm:px-6 lg:px-8 py-2">
-          <p className="text-sm text-accent-foreground text-center">
+        <div className="relative flex items-center justify-center px-4 sm:px-6 lg:px-8 py-2" style={{ backgroundColor: '#F1E7D3' }}>
+          <p className="promo-banner-text text-accent-foreground">
             {dict.landing.promoBanner}
           </p>
           <button
