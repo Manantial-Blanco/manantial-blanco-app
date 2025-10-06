@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { CheckIcon, ClockIcon, MoreHorizontalIcon } from '@/components/icons';
 import { Dictionary, Locale } from '@/types';
@@ -75,13 +76,18 @@ interface HomePageClientProps {
 }
 
 export default function HomePageClient({ lang, dict }: HomePageClientProps) {
+  const router = useRouter();
+
   return (
     <>
       <NavigationHeader lang={lang} dict={dict} />
       <main className="max-w-7xl mx-auto px-6 md:px-12 py-12 bg-gray-50">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-black">Artist Panel</h2>
-          <Button className="bg-blue-900 text-white hover:bg-blue-800 rounded-full px-6 py-3">
+          <Button 
+            onClick={() => router.push(`/${lang}/register-piece`)}
+            className="bg-blue-900 text-white hover:bg-blue-800 rounded-full px-6 py-3"
+          >
             Register Piece
           </Button>
         </div>
