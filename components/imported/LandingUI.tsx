@@ -67,6 +67,8 @@ const CategoryButton = ({ icon, text }: { icon: string; text: string }) => (
 
 export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
   const [showBanner, setShowBanner] = useState(true);
+  const { open } = useAppKit();
+  const { address, isConnected } = useAppKitAccount();
 
   const displayPieces = pieces.length > 0 
     ? pieces 
@@ -104,14 +106,12 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
     <div className="min-h-screen w-full flex flex-col bg-background font-sans">
       <style jsx>{`
         .nav-link {
-          font-family: 'SF Compact Display', sans-serif;
           font-weight: 500;
           font-size: 15px;
           line-height: 20px;
           letter-spacing: 0%;
         }
           .promo-banner-text {
-            font-family: 'SF Compact Display', sans-serif;
             font-weight: 500;
             font-size: 13px;
             line-height: 16px;
@@ -192,21 +192,71 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
           backgroundPosition: 'center',
         }}
       >
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/20" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight mb-4">
+          <h1 
+            className="mb-4"
+            style={{
+              fontWeight: 600,
+              fontStyle: 'normal',
+              fontSize: '90px',
+              lineHeight: '90px',
+              letterSpacing: '-2%',
+              textAlign: 'center',
+              verticalAlign: 'middle',
+              color: '#F1E7D3'
+            }}
+          >
             {dict.landing.heroTitle}
           </h1>
-          <p className="text-lg sm:text-xl max-w-2xl mx-auto mb-8">
+          <p 
+            className="max-w-2xl mx-auto mb-8"
+            style={{
+              fontWeight: 400,
+              fontStyle: 'Regular',
+              fontSize: '24px',
+              lineHeight: '26px',
+              letterSpacing: '-2%',
+              textAlign: 'center',
+              verticalAlign: 'middle'
+            }}
+          >
             {dict.landing.heroDescription}
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <appkit-button />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            {/* Register Your Cultural IP Button (Connect Wallet) */}
+            <button
+              onClick={() => open()}
+              className="px-8 py-4 bg-transparent rounded-full border-2 border-white/30 hover:bg-white/10 hover:border-white/50 transition-all duration-300"
+              style={{
+                fontFamily: 'Public Sans',
+                fontWeight: 500,
+                fontStyle: 'normal',
+                fontSize: '24px',
+                lineHeight: '20px',
+                letterSpacing: '0%',
+                color: '#F1E7D3'
+              }}
+              aria-label={isConnected ? 'Wallet connected' : 'Connect wallet to register your cultural IP'}
+            >
+              {isConnected ? 'Register Your Cultural IP' : 'Register Your Cultural IP'}
+            </button>
+            
+            {/* Work with Authentic Cultural IP Button (Explore Licensed Art) */}
             <a
               href="#catalog"
-              className="px-6 py-3 bg-accent rounded-md text-accent-foreground text-sm font-medium hover:bg-opacity-90 transition-all"
+              className="px-8 py-4 text-black rounded-full transition-all duration-300"
+              style={{
+                backgroundColor: '#F1E7D3',
+                fontFamily: 'Public Sans',
+                fontWeight: 500,
+                fontStyle: 'normal',
+                fontSize: '24px',
+                lineHeight: '20px',
+                letterSpacing: '0%'
+              }}
             >
-              {dict.landing.exploreCTA}
+              Work with Authentic Cultural IP
             </a>
           </div>
         </div>
