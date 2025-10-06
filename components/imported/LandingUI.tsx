@@ -59,9 +59,27 @@ const FooterLinkColumn = ({ title, links, dict }: { title: string; links: Array<
 );
 
 const CategoryButton = ({ icon, text }: { icon: string; text: string }) => (
-  <button className="flex items-center justify-center gap-2 p-4 bg-accent rounded-md text-accent-foreground text-sm font-semibold hover:bg-opacity-90 transition-colors">
+  <button 
+    className="flex items-center justify-center hover:opacity-90 transition-colors" 
+    style={{ 
+      backgroundColor: '#F1E7D3', 
+      color: '#000',
+      width: '306px',
+      height: '97px',
+      gap: '10px',
+      opacity: 1,
+      borderRadius: '8px',
+      borderWidth: '2px',
+      padding: '10px'
+    }}
+  >
     <Icon icon={icon} className="w-5 h-5" />
-    <span>{text}</span>
+    <span style={{ 
+      fontWeight: 600,
+      fontSize: '24px',
+      lineHeight: '20px',
+      letterSpacing: '0%'
+    }}>{text}</span>
   </button>
 );
 
@@ -194,12 +212,17 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
 
       {/* Explore Section */}
       <div id="catalog" className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <h2 className="text-3xl font-bold text-center mb-8">
+        <h2 className="mb-8" style={{
+          fontWeight: 600,
+          fontSize: '32px',
+          lineHeight: '20px',
+          letterSpacing: '0%'
+        }}>
           {dict.landing.exploreTitle}
         </h2>
 
         {/* Categories */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 mb-8" style={{ gap: '40px' }}>
           <CategoryButton icon="audioVisual" text={dict.landing.categories.audioVisual} />
           <CategoryButton icon="illustrations" text={dict.landing.categories.illustrations} />
           <CategoryButton icon="music" text={dict.landing.categories.music} />
@@ -207,9 +230,9 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
         </div>
 
         {/* Search Bar */}
-        <div className="border-b pb-6 mb-6">
+        <div className="border-b border-black pb-6 mb-6">
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="flex-1 w-full flex items-center gap-2 px-4 py-2 border bg-secondary rounded-md">
+            <div className="flex-1 w-full flex items-center gap-2 px-4 py-2 border rounded-md" style={{ backgroundColor: '#E3E3E333' }}>
               <Search className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
               <input
                 type="text"
@@ -218,7 +241,19 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
                 aria-label="Search artworks"
               />
             </div>
-            <button className="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors w-full sm:w-auto">
+            <button 
+              className="px-8 py-3 text-white rounded-full transition-colors w-full sm:w-auto shadow-md" 
+              style={{ 
+                backgroundColor: '#486B91',
+                fontWeight: 500,
+                fontStyle: 'normal',
+                fontSize: '15px',
+                lineHeight: '20px',
+                letterSpacing: '0%'
+              }} 
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3a5576'} 
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#486B91'}
+            >
               {dict.common.search}
             </button>
           </div>
