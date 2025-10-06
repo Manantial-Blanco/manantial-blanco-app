@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { prepareAsset, mintPiece } from '@/lib/services/story';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { generateProvenanceHash } from '@/lib/crypto';
@@ -176,11 +177,14 @@ export default function RemixPage({
             <h3 className="text-lg font-semibold text-black mb-4">
               Original Piece
             </h3>
-            <img
-              src={originalPiece.image_url}
-              alt={originalPiece.title}
-              className="w-full h-auto rounded-lg border border-gray-200"
-            />
+            <div className="relative w-full aspect-square">
+              <Image
+                src={originalPiece.image_url}
+                alt={originalPiece.title}
+                fill
+                className="object-contain rounded-lg border border-gray-200"
+              />
+            </div>
             <h4 className="text-xl font-bold text-black mt-4">
               {originalPiece.title}
             </h4>
@@ -191,11 +195,14 @@ export default function RemixPage({
               Your Remix
             </h3>
             {imagePreview ? (
-              <img
-                src={imagePreview}
-                alt="Remix preview"
-                className="w-full h-auto rounded-lg border border-gray-200"
-              />
+              <div className="relative w-full aspect-square">
+                <Image
+                  src={imagePreview}
+                  alt="Remix preview"
+                  fill
+                  className="object-contain rounded-lg border border-gray-200"
+                />
+              </div>
             ) : (
               <div className="w-full aspect-square bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
                 <p className="text-gray-400">Upload your remix image</p>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Search, User, ShoppingBag, X, ChevronDown } from "lucide-react";
+import Image from "next/image";
 
 export default function Index() {
   const [showBanner, setShowBanner] = useState(true);
@@ -25,9 +26,11 @@ export default function Index() {
       <header className="bg-black px-6 md:px-12 py-4 relative">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <img
+          <Image
             src="https://api.builder.io/api/v1/image/assets/TEMP/ea629e82a91ce81420ddaa0d00e82cc21e151b0e?width=102"
             alt="MB Logo"
+            width={102}
+            height={32}
             className="h-8 w-auto"
           />
 
@@ -238,9 +241,11 @@ export default function Index() {
             {[...Array(8)].map((_, i) => (
               <div key={i} className="flex flex-col gap-3">
                 <div className="relative rounded aspect-square border border-[#E3E3E3]">
-                  <img
+                  <Image
                     src="https://api.builder.io/api/v1/image/assets/TEMP/48aa5b824a85d8fa5303beb1454b088c338a765a?width=636"
                     alt="Alebrije Alado"
+                    width={636}
+                    height={636}
                     className="w-full h-full object-cover rounded"
                   />
                   <div className="absolute top-2 right-2 p-2">
@@ -359,7 +364,7 @@ export default function Index() {
               <p className="text-[#D6DDE6] text-[17px] font-['SF_Compact'] leading-7">
                 Remixing a piece of art involves taking existing artwork and
                 altering or combining it with other elements to create something
-                new. This process respects the original creator's rights while
+                new. This process respects the original creator&apos;s rights while
                 fostering creativity and innovation.
               </p>
             </div>
@@ -395,9 +400,11 @@ export default function Index() {
 
       {/* Why Cultural IP Section */}
       <section className="flex flex-col md:flex-row items-center bg-[#F1E7D3]">
-        <img
+        <Image
           src="https://api.builder.io/api/v1/image/assets/TEMP/6b1c947ce7eedd700fc7886bf2c1085e9394351b?width=1350"
           alt="Felipe Linares"
+          width={1350}
+          height={900}
           className="w-full md:w-1/2 h-auto object-cover"
         />
         <div className="w-full md:w-1/2 px-6 md:px-12 py-12">
@@ -405,7 +412,7 @@ export default function Index() {
             Why cultural intellectual property matters?
           </h2>
           <p className="text-[#080F17] text-[15px] leading-5 font-['SF_Compact']">
-            LATAM's $380B cultural IP market has been exploited for decades.
+            LATAM&apos;s $380B cultural IP market has been exploited for decades.
             Manantial Blanco changes that. Register your work onchain, license
             it globally, and receive every royalty payment—automatically and
             transparently.
@@ -458,9 +465,11 @@ export default function Index() {
               className="min-w-[288px] border border-[#E3E3E3] rounded p-6 flex flex-col gap-4"
             >
               <div className="flex items-center gap-3">
-                <img
+                <Image
                   src={testimonial.img}
                   alt={testimonial.name}
+                  width={48}
+                  height={48}
                   className="w-12 h-12 rounded-full border-[1.5px] border-[#D6DDE6]/20"
                 />
                 <div className="flex-1">
@@ -504,9 +513,11 @@ export default function Index() {
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Logo & Socials */}
           <div className="flex flex-col gap-3">
-            <img
+            <Image
               src="https://api.builder.io/api/v1/image/assets/TEMP/fbec6c0e4a201b670919c5278456b8471619bec0?width=92"
               alt="MB Logo"
+              width={92}
+              height={32}
               className="h-8 w-auto"
             />
             <div className="flex gap-3">

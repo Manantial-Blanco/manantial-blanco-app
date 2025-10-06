@@ -2,6 +2,7 @@ import { getDictionary, isValidLocale } from '@/lib/i18n/getDict';
 import { Locale } from '@/types';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { getPieceToken } from '@/lib/services/story';
 
@@ -71,11 +72,12 @@ export default async function PieceDetailPage({
       <main className="max-w-7xl mx-auto px-6 md:px-12 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Image */}
-          <div>
-            <img
+          <div className="relative w-full aspect-square">
+            <Image
               src={piece.image_url}
               alt={piece.title}
-              className="w-full h-auto rounded-lg border border-gray-200"
+              fill
+              className="object-contain rounded-lg border border-gray-200"
             />
           </div>
 
