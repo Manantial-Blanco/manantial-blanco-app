@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, User, ShoppingBag, X, ChevronDown } from 'lucide-react';
+import { Search, X, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Dictionary, Locale } from '@/types';
-import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { LanguageDropdown } from '@/components/layout/LanguageDropdown';
+import { WalletUserButton } from '@/components/layout/WalletUserButton';
 
 interface LandingUIProps {
   dict: Dictionary;
@@ -159,12 +160,16 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
               </Link>
             </nav>
 
-            {/* Icons & Language Switcher */}
-            <div className="flex items-center gap-4">
-              <LanguageSwitcher currentLang={lang} />
-              <Search className="w-5 h-5 cursor-pointer hover:text-accent transition-colors" aria-label="Search" />
-              <appkit-button />
-              <ShoppingBag className="w-5 h-5 cursor-pointer hover:text-accent transition-colors" aria-label="Shopping bag" />
+            {/* Icons - Search, User, Globe */}
+            <div className="flex items-center gap-2">
+              <button
+                className="flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors"
+                aria-label="Search"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+              <WalletUserButton />
+              <LanguageDropdown currentLang={lang} />
             </div>
           </div>
         </div>
