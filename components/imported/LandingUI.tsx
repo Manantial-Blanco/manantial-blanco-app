@@ -72,7 +72,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
     : Array(8).fill(null).map((_, i) => ({
         id: `placeholder-${i}`,
         title: 'Alebrije Alado',
-        imageUrl: '/placeholder-art.png',
+        imageUrl: '/images/placeholder-art.png?width=2886',
         creatorName: 'Felipe Linares Vargas',
       }));
 
@@ -101,6 +101,15 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background font-sans">
+      <style jsx>{`
+        .nav-link {
+          font-family: 'SF Compact Display', sans-serif;
+          font-weight: 500;
+          font-size: 15px;
+          line-height: 20px;
+          letter-spacing: 0%;
+        }
+      `}</style>
       {/* Promo Banner */}
       {showBanner && (
         <div className="relative flex items-center justify-center bg-accent px-4 sm:px-6 lg:px-8 py-2">
@@ -118,13 +127,13 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
       )}
 
       {/* Header Navigation */}
-      <header className="bg-primary text-primary-foreground sticky top-0 z-50">
+      <header className="bg-black text-white sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href={`/${lang}/landing`} className="flex items-center">
               <Image
-                src="/logo-white.svg" // Replace with your logo
+                src="/images/MB-logo-01.png" // Replace with your logo
                 alt="Manantial Blanco Logo"
                 width={32}
                 height={32}
@@ -133,22 +142,19 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
 
             {/* Navigation Links - Desktop */}
             <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-              <Link href={`/${lang}/landing`} className="text-sm hover:text-accent transition-colors">
-                {dict.common.home}
-              </Link>
-              <Link href={`/${lang}/login`} className="text-sm flex items-center gap-1 hover:text-accent transition-colors">
+              <Link href={`/${lang}/login`} className="nav-link flex items-center gap-1 hover:text-accent transition-colors">
                 {dict.landing.registerCTA}
                 <ChevronDown className="w-4 h-4" />
               </Link>
-              <a href="#catalog" className="text-sm flex items-center gap-1 hover:text-accent transition-colors">
+              <a href="#catalog" className="nav-link flex items-center gap-1 hover:text-accent transition-colors">
                 {dict.landing.exploreCTA}
                 <ChevronDown className="w-4 h-4" />
               </a>
-              <Link href="#" className="text-sm flex items-center gap-1 hover:text-accent transition-colors">
+              <Link href="#" className="nav-link flex items-center gap-1 hover:text-accent transition-colors">
                 {dict.common.about}
                 <ChevronDown className="w-4 h-4" />
               </Link>
-              <Link href="#" className="text-sm flex items-center gap-1 hover:text-accent transition-colors">
+              <Link href="#" className="nav-link flex items-center gap-1 hover:text-accent transition-colors">
                 {dict.common.contact}
               </Link>
             </nav>
@@ -170,7 +176,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
       <section
         className="relative w-full h-[600px] flex items-center justify-center text-center text-white"
         style={{
-          backgroundImage: "url('/hero-background.jpg')", // Replace with your hero image
+          backgroundImage: "url('/images/hero-background.png?width=2886')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -368,11 +374,11 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
           {/* Logo & Socials */}
           <div className="flex flex-col gap-3">
             <Image
-              src="https://api.builder.io/api/v1/image/assets/TEMP/fbec6c0e4a201b670919c5278456b8471619bec0?width=92"
+              src="/images/MB-logo-02.png"
               alt="MB Logo"
-              width={92}
-              height={32}
-              className="h-8 w-auto"
+              width={46}
+              height={46}
+              // className="h-8 w-auto"
             />
             <div className="flex gap-3">
               <a href="#" aria-label="Facebook">
