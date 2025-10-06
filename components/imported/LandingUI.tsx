@@ -19,7 +19,7 @@ interface LandingUIProps {
   }>;
 }
 
-const Icon = ({ icon, className }: { icon: string; className?: string }) => {
+const Icon = ({ icon, className, style }: { icon: string; className?: string; style?: React.CSSProperties }) => {
   const icons: { [key: string]: React.ReactNode } = {
     audioVisual: <svg width="20" height="16" viewBox="0 0 21 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.49524 16.8779C1.94524 16.8779 1.47457 16.6823 1.08324 16.2909C0.691239 15.8989 0.495239 15.4279 0.495239 14.8779V2.87793C0.495239 2.32793 0.691239 1.85726 1.08324 1.46593C1.47457 1.07393 1.94524 0.87793 2.49524 0.87793H14.4952C15.0452 0.87793 15.5162 1.07393 15.9082 1.46593C16.2996 1.85726 16.4952 2.32793 16.4952 2.87793V7.37793L20.4952 3.37793V14.3779L16.4952 10.3779V14.8779C16.4952 15.4279 16.2996 15.8989 15.9082 16.2909C15.5162 16.6823 15.0452 16.8779 14.4952 16.8779H2.49524ZM2.49524 14.8779H14.4952V2.87793H2.49524V14.8779ZM3.49524 12.8779H13.4952L10.0452 8.37793L7.74524 11.3779L6.19524 9.37793L3.49524 12.8779Z" fill="currentColor"/></svg>,
     illustrations: <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.99524 20.8779C2.16191 20.8779 1.45357 20.5863 0.870239 20.0029C0.286906 19.4196 -0.00476074 18.7113 -0.00476074 17.8779V3.87793C-0.00476074 3.0446 0.286906 2.33626 0.870239 1.75293C1.45357 1.1696 2.16191 0.87793 2.99524 0.87793H16.9952C17.8286 0.87793 18.5369 1.1696 19.1202 1.75293C19.7036 2.33626 19.9952 3.0446 19.9952 3.87793V17.8779C19.9952 18.7113 19.7036 19.4196 19.1202 20.0029C18.5369 20.5863 17.8286 20.8779 16.9952 20.8779H2.99524ZM2.99524 18.8779H16.9952C17.2786 18.8779 17.5159 18.7819 17.7072 18.5899C17.8992 18.3986 17.9952 18.1613 17.9952 17.8779V3.87793C17.9952 3.5946 17.8992 3.35693 17.7072 3.16493C17.5159 2.9736 17.2786 2.87793 16.9952 2.87793H2.99524C2.71191 2.87793 2.47424 2.9736 2.28224 3.16493C2.09091 3.35693 1.99524 3.5946 1.99524 3.87793V17.8779C1.99524 18.1613 2.09091 18.3986 2.28224 18.5899C2.47424 18.7819 2.71191 18.8779 2.99524 18.8779ZM3.99524 16.8779L7.99524 12.8779L9.79524 14.6529L11.9952 11.8779L15.9952 16.8779H3.99524ZM5.99524 8.87793C5.44524 8.87793 4.97457 8.68193 4.58324 8.28993C4.19124 7.8986 3.99524 7.42793 3.99524 6.87793C3.99524 6.32793 4.19124 5.85726 4.58324 5.46593C4.97457 5.07393 5.44524 4.87793 5.99524 4.87793C6.54524 4.87793 7.01624 5.07393 7.40824 5.46593C7.79957 5.85726 7.99524 6.32793 7.99524 6.87793C7.99524 7.42793 7.79957 7.8986 7.40824 8.28993C7.01624 8.68193 6.54524 8.87793 5.99524 8.87793Z" fill="currentColor"/></svg>,
@@ -32,17 +32,17 @@ const Icon = ({ icon, className }: { icon: string; className?: string }) => {
     instagram: <svg width="24" height="24" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.4952 6.88029C9.455 6.88029 7.00143 9.33386 7.00143 12.374C7.00143 15.4142 9.455 17.8678 12.4952 17.8678C15.5354 17.8678 17.9889 15.4142 17.9889 12.374C17.9889 9.33386 15.5354 6.88029 12.4952 6.88029ZM12.4952 15.9446C10.5291 15.9446 8.92464 14.3401 8.92464 12.374C8.92464 10.408 10.5291 8.8035 12.4952 8.8035C14.4613 8.8035 16.0657 10.408 16.0657 12.374C16.0657 14.3401 14.4613 15.9446 12.4952 15.9446ZM18.2139 5.37493C17.5041 5.37493 16.9309 5.94815 16.9309 6.65797C16.9309 7.36779 17.5041 7.941 18.2139 7.941C18.9238 7.941 19.497 7.37047 19.497 6.65797C19.4972 6.48942 19.4641 6.32248 19.3997 6.16672C19.3353 6.01096 19.2408 5.86944 19.1216 5.75025C19.0025 5.63107 18.8609 5.53657 18.7052 5.47217C18.5494 5.40776 18.3825 5.37472 18.2139 5.37493ZM23.2041 12.374C23.2041 10.8955 23.2175 9.43029 23.1345 7.9544C23.0514 6.24011 22.6604 4.71868 21.4068 3.46511C20.1505 2.20886 18.6318 1.82047 16.9175 1.73743C15.4389 1.6544 13.9738 1.66779 12.4979 1.66779C11.0193 1.66779 9.55411 1.6544 8.07821 1.73743C6.36393 1.82047 4.8425 2.21154 3.58893 3.46511C2.33268 4.72136 1.94428 6.24011 1.86125 7.9544C1.77821 9.43297 1.79161 10.8981 1.79161 12.374C1.79161 13.8499 1.77821 15.3178 1.86125 16.7937C1.94428 18.508 2.33536 20.0294 3.58893 21.283C4.84518 22.5392 6.36393 22.9276 8.07821 23.0106C9.55679 23.0937 11.022 23.0803 12.4979 23.0803C13.9764 23.0803 15.4416 23.0937 16.9175 23.0106C18.6318 22.9276 20.1532 22.5365 21.4068 21.283C22.663 20.0267 23.0514 18.508 23.1345 16.7937C23.2202 15.3178 23.2041 13.8526 23.2041 12.374ZM20.847 18.6901C20.6514 19.1776 20.4157 19.5419 20.038 19.9169C19.6604 20.2946 19.2988 20.5303 18.8113 20.7258C17.4023 21.2856 14.0568 21.1598 12.4952 21.1598C10.9336 21.1598 7.58536 21.2856 6.17643 20.7285C5.68893 20.533 5.32464 20.2973 4.94964 19.9196C4.57196 19.5419 4.33625 19.1803 4.14071 18.6928C3.58357 17.2812 3.70946 13.9356 3.70946 12.374C3.70946 10.8124 3.58357 7.46422 4.14071 6.05529C4.33625 5.56779 4.57196 5.2035 4.94964 4.8285C5.32732 4.45357 5.68893 4.21786 6.17643 4.02232C7.58536 3.4625 10.9336 3.58821 12.4952 3.58821C14.0568 3.58821 17.405 3.4625 18.8113 4.01964C19.2988 4.21518 19.663 4.45089 20.038 4.82589C20.4157 5.20089 20.6514 5.56518 20.847 6.05268C21.4041 7.46422 21.2782 10.8124 21.2782 12.374C21.2782 13.9356 21.4041 17.2839 20.847 18.6901Z" fill="currentColor"/></svg>,
     twitter: <svg width="24" height="24" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.1712 11.0366L20.7243 3.57715H19.172L13.4795 10.0528L8.93639 3.57715H3.69511L10.5667 13.3704L3.69511 21.1918H5.24743L11.2549 14.3519L16.0538 21.1918H21.2951M5.80769 4.7235H8.19249L19.1708 20.1018H16.7854" fill="currentColor"/></svg>,
   };
-  return <div className={className}>{icons[icon]}</div>;
+  return <div className={className} style={style}>{icons[icon]}</div>;
 };
 
 const FeatureItem = ({ icon, title, description }: { icon: string; title: string; description: string }) => (
-  <div className="flex flex-col items-center text-center gap-4">
-    <div className="w-16 h-16 flex items-center justify-center">
-      <Icon icon={icon} className="w-12 h-12 text-accent" />
+  <div className="flex flex-col items-center gap-6 max-w-sm mx-auto">
+    <div className="w-24 h-24 flex items-center justify-center">
+      <Icon icon={icon} className="w-16 h-16" style={{ color: '#F1E7D3' }} />
     </div>
-    <div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-sm text-muted-foreground">{description}</p>
+    <div className="space-y-4 text-left">
+      <h3 className="text-2xl font-semibold" style={{ color: '#F1E7D3' }}>{title}</h3>
+      <p className="text-base text-gray-300 leading-relaxed">{description}</p>
     </div>
   </div>
 );
@@ -305,9 +305,9 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
       </div>
 
       {/* Features Section */}
-      <section className="bg-primary text-primary-foreground py-16">
+      <section className="bg-black py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-20">
             <FeatureItem
               icon="register"
               title={dict.landing.features.registerIP.title}
@@ -328,12 +328,12 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
       </section>
 
       {/* Why Cultural IP Section */}
-      <section className="bg-accent text-accent-foreground">
+      <section className="text-accent-foreground" style={{ backgroundColor: '#F1E7D3' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
             <div className="w-full md:w-1/2">
               <Image
-                src="/cultural-ip.jpg" // Replace with your image
+                src="/images/cultural-ip.jpg" // Replace with your image
                 alt="Artist working on a sculpture"
                 width={600}
                 height={400}
@@ -341,12 +341,22 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
               />
             </div>
             <div className="w-full md:w-1/2">
-              <h2 className="text-3xl font-bold mb-4">
+              <h2 className="mb-4" style={{ 
+                fontWeight: 600,
+                fontSize: '32px',
+                lineHeight: '32px',
+                letterSpacing: '0%'
+              }}>
                 {dict.landing.whyCulturalIP.title}
               </h2>
-              <p className="text-muted-foreground">
-                {dict.landing.whyCulturalIP.description}
-              </p>
+              <div className="text-muted-foreground">
+                <p className="mb-4">
+                  {dict.landing.whyCulturalIP.description}
+                </p>
+                <p>
+                  {dict.landing.whyCulturalIP.description2}
+                </p>
+              </div>
             </div>
           </div>
         </div>
