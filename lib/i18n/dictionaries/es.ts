@@ -35,19 +35,19 @@ export const es: Dictionary = {
     },
     features: {
       registerIP: {
-        title: 'Registrando Propiedad Intelectual de Arte',
+        title: 'Registrar',
         description:
-          'Registrar una pieza de propiedad intelectual de arte significa proteger legalmente tu trabajo creativo. Asegura que tienes derechos exclusivos para usar y distribuir tu obra, previniendo el uso no autorizado por otros.',
+          'Sube tu trabajo cultural con procedencia verificada. Creamos un "certificado de nacimiento digital" como un activo protegido y rastreable.',
       },
       remixArt: {
-        title: 'Remezclando Arte',
+        title: 'Remezclar',
         description:
-          'Remezclar una pieza de arte implica tomar una obra existente y alterarla o combinarla con otros elementos para crear algo nuevo. Este proceso respeta los derechos del creador original mientras fomenta la creatividad e innovación.',
+          'Para Creadores de PI: Las marcas y artistas pueden licenciar tu PI directamente—instantánea y transparentemente. Tú controlas quién la usa y cómo. Para Artistas: Inspírate en PIs culturales registradas para crear nuevas obras derivadas—con total transparencia y atribución a los creadores originales.',
       },
       releaseRemix: {
-        title: 'Lanzando una Remezcla',
+        title: 'Lanzar',
         description:
-          'Lanzar una remezcla significa publicar tu nueva versión de una obra de arte, a menudo bajo licencias específicas que dictan cómo puede ser usada. Esto permite que otros aprecien y potencialmente construyan sobre tu reinterpretación creativa.',
+          'Cuando las obras derivadas se lanzan, las regalías fluyen automáticamente tanto al artista como a la billetera del artesano original. Cada venta. Cada licencia. Para siempre.',
       },
     },
     whyCulturalIP: {
@@ -81,6 +81,12 @@ export const es: Dictionary = {
     disconnect: 'Desconectar',
     signIn: 'Iniciar Sesión',
     signOut: 'Cerrar Sesión',
+    welcome: 'Bienvenido a Manantial Blanco',
+    getStarted: 'Conecta tu billetera para comenzar',
+    termsAgreement: 'Al conectarte, aceptas nuestros Términos de Servicio y Política de Privacidad',
+    backToLanding: '← Volver a la Página de Inicio',
+    walletConnected: 'Billetera conectada',
+    connectToRegister: 'Conectar billetera para registrar tu propiedad intelectual cultural',
   },
   pieces: {
     registerNew: 'Registrar Nueva Pieza',

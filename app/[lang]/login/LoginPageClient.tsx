@@ -59,10 +59,10 @@ export default function LoginPageClient({ lang, dict }: LoginPageClientProps) {
           <div className="bg-white rounded-2xl shadow-2xl p-8">
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold text-black mb-2">
-                Welcome to Manantial Blanco
+                {dict.auth.welcome}
               </h1>
               <p className="text-gray-600">
-                Connect your wallet to get started
+                {dict.auth.getStarted}
               </p>
             </div>
 
@@ -70,13 +70,12 @@ export default function LoginPageClient({ lang, dict }: LoginPageClientProps) {
               onClick={handleConnect}
               className="w-full py-4 px-6 bg-black text-white rounded-full font-semibold text-lg hover:bg-gray-800 transition-colors"
             >
-              Connect Wallet
+              {dict.auth.connectWallet}
             </button>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-500">
-                By connecting, you agree to our Terms of Service and Privacy
-                Policy
+                {dict.auth.termsAgreement}
               </p>
             </div>
 
@@ -85,7 +84,7 @@ export default function LoginPageClient({ lang, dict }: LoginPageClientProps) {
                 href={`/${lang}/landing`}
                 className="text-sm text-gray-600 hover:text-black transition-colors"
               >
-                ← Back to Landing Page
+                {dict.auth.backToLanding}
               </a>
             </div>
           </div>

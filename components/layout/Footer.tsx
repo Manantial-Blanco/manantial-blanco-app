@@ -142,21 +142,21 @@ export default function Footer({ dict }: FooterProps) {
         <div className="flex-shrink-0 w-full lg:w-fit flex flex-col gap-6">
           <div>
             <h4 className="text-black text-[15px] font-sf-compact font-normal leading-5 mb-2">
-              Newsletter
+              {dict.landing.footer.newsletter}
             </h4>
             <p className="text-black text-[15px] font-sf-compact leading-5">
-              Stay updated with the latest art trends and exclusive offers.
+              {dict.landing.footer.newsletterDescription}
             </p>
           </div>
           <div className="flex flex-col md:flex-row gap-3">
             <input
               type="email"
-              placeholder="Email address"
+              placeholder={dict.landing.footer.emailPlaceholder}
               className="flex-1 px-6 h-[36px] border-2 border-black rounded-[8px] outline-none text-[16px] font-sf-compact leading-5 focus:border-black transition-all duration-200 bg-white placeholder:text-black"
-              aria-label="Email address"
+              aria-label={dict.landing.footer.emailPlaceholder}
             />
             <button className="px-8 h-[36px] bg-white border-2 border-black text-black text-[16px] font-sf-compact leading-5 rounded-[8px] hover:bg-gray-50 active:bg-gray-100 transition-colors duration-200 whitespace-nowrap flex items-center">
-              Subscribe
+              {dict.common.subscribe}
             </button>
           </div>
         </div>
