@@ -345,7 +345,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             {/* Register Your Cultural IP Button (Connect Wallet) */}
             <button
-              onClick={() => (isConnected ? router.push(`/${lang}/register-piece`) : open())}
+              onClick={() => (isConnected ? router.push(`/${lang}/home`) : open())}
               className="px-8 py-4 bg-transparent rounded-full border-2 border-white/30 hover:bg-white/10 hover:border-white/50 transition-all duration-300"
               style={{
                 fontFamily: 'Public Sans',
