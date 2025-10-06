@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, User, ShoppingBag, X, ChevronDown } from 'lucide-react';
+import { Search, X, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Dictionary, Locale } from '@/types';
-import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { LanguageDropdown } from '@/components/layout/LanguageDropdown';
+import { WalletUserButton } from '@/components/layout/WalletUserButton';
+import { WalletAuthRedirect } from '@/components/auth/WalletAuthRedirect';
 
 interface LandingUIProps {
   dict: Dictionary;
@@ -101,6 +103,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background font-sans">
+      <WalletAuthRedirect lang={lang} />
       <style jsx>{`
         .nav-link {
           font-family: 'SF Compact Display', sans-serif;
@@ -109,11 +112,19 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
           line-height: 20px;
           letter-spacing: 0%;
         }
+          .promo-banner-text {
+            font-family: 'SF Compact Display', sans-serif;
+            font-weight: 500;
+            font-size: 13px;
+            line-height: 16px;
+            letter-spacing: 0;
+            text-align: center;
+          }
       `}</style>
       {/* Promo Banner */}
       {showBanner && (
-        <div className="relative flex items-center justify-center bg-accent px-4 sm:px-6 lg:px-8 py-2">
-          <p className="text-sm text-accent-foreground text-center">
+        <div className="relative flex items-center justify-center px-4 sm:px-6 lg:px-8 py-2" style={{ backgroundColor: '#F1E7D3' }}>
+          <p className="promo-banner-text text-accent-foreground">
             {dict.landing.promoBanner}
           </p>
           <button
@@ -159,12 +170,16 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
               </Link>
             </nav>
 
-            {/* Icons & Language Switcher */}
-            <div className="flex items-center gap-4">
-              <LanguageSwitcher currentLang={lang} />
-              <Search className="w-5 h-5 cursor-pointer hover:text-accent transition-colors" aria-label="Search" />
-              <appkit-button />
-              <ShoppingBag className="w-5 h-5 cursor-pointer hover:text-accent transition-colors" aria-label="Shopping bag" />
+            {/* Icons - Search, User, Globe */}
+            <div className="flex items-center gap-2">
+              <button
+                className="flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors"
+                aria-label="Search"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+              <WalletUserButton />
+              <LanguageDropdown currentLang={lang} />
             </div>
           </div>
         </div>

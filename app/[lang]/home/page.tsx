@@ -2,6 +2,7 @@ import { getDictionary, isValidLocale } from '@/lib/i18n/getDict';
 import { Locale } from '@/types';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { LogoutButton } from '@/components/auth/LogoutButton';
 
 export default async function HomePage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
@@ -19,14 +20,17 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           <Link href={`/${lang}/landing`}>
             <h1 className="text-2xl font-bold">Manantial Blanco</h1>
           </Link>
-          <nav className="flex items-center gap-6">
-            <Link href={`/${lang}/home`} className="hover:text-[#F1E7D3]">
-              {dict.common.home}
-            </Link>
-            <Link href={`/${lang}/pieces/new`} className="hover:text-[#F1E7D3]">
-              {dict.pieces.registerNew}
-            </Link>
-          </nav>
+          <div className="flex items-center gap-6">
+            <nav className="flex items-center gap-6">
+              <Link href={`/${lang}/home`} className="hover:text-[#F1E7D3]">
+                {dict.common.home}
+              </Link>
+              <Link href={`/${lang}/pieces/new`} className="hover:text-[#F1E7D3]">
+                {dict.pieces.registerNew}
+              </Link>
+            </nav>
+            <LogoutButton lang={lang as Locale} label={dict.common.logout || 'Logout'} />
+          </div>
         </div>
       </header>
 

@@ -48,6 +48,7 @@ export interface Dictionary {
     subscribe: string;
     loading: string;
     error: string;
+    logout: string;
   };
   landing: {
     promoBanner: string;

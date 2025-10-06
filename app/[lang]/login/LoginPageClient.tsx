@@ -1,48 +1,47 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { connect } from '@/lib/services/reown';
+import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 export default function LoginPageClient({ lang }: { lang: string }) {
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { open } = useAppKit();
+  const { address, isConnected } = useAppKitAccount();
 
-  const handleConnect = async () => {
-    setIsConnecting(true);
-    setError(null);
+  // Handle wallet connection and user creation
+  useEffect(() => {
+    const handleUserCreation = async () => {
+      if (isConnected && address) {
+        // Create or update user profile in Supabase
+        if (isSupabaseConfigured()) {
+          const { data: existingUser } = await supabase
+            .from('users')
+            .select('*')
+            .eq('wallet_address', address)
+            .single();
 
-    try {
-      const { walletAddress } = await connect();
-
-      // Create or update user profile in Supabase
-      if (isSupabaseConfigured()) {
-        const { data: existingUser } = await supabase
-          .from('users')
-          .select('*')
-          .eq('wallet_address', walletAddress)
-          .single();
-
-        if (!existingUser) {
-          // Create new user with default role 'creative'
-          await supabase.from('users').insert({
-            wallet_address: walletAddress,
-            role: 'creative',
-            display_name: `User ${walletAddress.slice(0, 6)}`,
-          });
+          if (!existingUser) {
+            // Create new user with default role 'creative'
+            await supabase.from('users').insert({
+              wallet_address: address,
+              role: 'creative',
+              display_name: `User ${address.slice(0, 6)}`,
+            });
+          }
         }
-      }
 
-      // Redirect to home page
-      router.push(`/${lang}/home`);
-    } catch (err) {
-      console.error('Connection error:', err);
-      setError('Failed to connect wallet. Please try again.');
-    } finally {
-      setIsConnecting(false);
-    }
+        // Redirect to home page
+        router.push(`/${lang}/home`);
+      }
+    };
+
+    handleUserCreation();
+  }, [isConnected, address, lang, router]);
+
+  const handleConnect = () => {
+    open();
   };
 
   return (
@@ -58,18 +57,11 @@ export default function LoginPageClient({ lang }: { lang: string }) {
             </p>
           </div>
 
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{error}</p>
-            </div>
-          )}
-
           <button
             onClick={handleConnect}
-            disabled={isConnecting}
-            className="w-full py-4 px-6 bg-black text-white rounded-full font-semibold text-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 px-6 bg-black text-white rounded-full font-semibold text-lg hover:bg-gray-800 transition-colors"
           >
-            {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+            Connect Wallet
           </button>
 
           <div className="mt-6 text-center">

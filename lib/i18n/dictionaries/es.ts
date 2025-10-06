@@ -14,6 +14,7 @@ export const es: Dictionary = {
     subscribe: 'Suscribirse',
     loading: 'Cargando...',
     error: 'Ocurrió un error',
+    logout: 'Cerrar Sesión',
   },
   landing: {
     promoBanner: 'Descubre Piezas de Arte Únicas',
