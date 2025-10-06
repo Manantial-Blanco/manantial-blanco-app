@@ -35,25 +35,27 @@ export const en: Dictionary = {
     },
     features: {
       registerIP: {
-        title: 'Registering Art IP',
+        title: 'Register',
         description:
-          'Registering a piece of art IP means legally protecting your creative work. It ensures that you have exclusive rights to use and distribute your artwork, preventing unauthorized use by others.',
+          'Upload your cultural work with verified provenance. We create a "digital birth certificate" as a protected, traceable asset.',
       },
       remixArt: {
-        title: 'Remixing Art',
+        title: 'Remix',
         description:
-          "Remixing a piece of art involves taking existing artwork and altering or combining it with other elements to create something new. This process respects the original creator's rights while fostering creativity and innovation.",
+          "For IP Creators: Brands and artists can license your IP directly—instantly and transparently. You control who uses it and how. For Artists: Draw inspiration from registered cultural IPs to create new derivative works—with full transparency and attribution to the original creators.",
       },
       releaseRemix: {
-        title: 'Releasing a Remix',
+        title: 'Release',
         description:
-          'Releasing a remix means publishing your new version of an artwork, often under specific licenses that dictate how it can be used. This allows others to appreciate and potentially build upon your creative reinterpretation.',
+          'When derivative works are released, royalties flow automatically to both the artist and the original artisan wallet. Every sale. Every license. Forever.',
       },
     },
     whyCulturalIP: {
       title: 'Why cultural intellectual property matters?',
       description:
         "LATAM's $380B cultural IP market has been exploited for decades. Manantial Blanco changes that. Register your work onchain, license it globally, and receive every royalty payment—automatically and transparently.",
+      description2:
+        "Latin America's heritage belongs to its artisans. We're making sure they finally get paid for it.",
     },
     testimonials: {
       title: 'Artists are thriving with Manantial Blanco',

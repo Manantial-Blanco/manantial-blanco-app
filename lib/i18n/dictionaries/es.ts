@@ -54,6 +54,8 @@ export const es: Dictionary = {
       title: '¿Por qué importa la propiedad intelectual cultural?',
       description:
         'El mercado de propiedad intelectual cultural de $380B de LATAM ha sido explotado durante décadas. Manantial Blanco cambia eso. Registra tu trabajo en la cadena, licéncialo globalmente y recibe cada pago de regalías—automáticamente y de forma transparente.',
+      description2:
+        'El patrimonio de América Latina pertenece a sus artesanos. Nos estamos asegurando de que finalmente reciban el pago que merecen.',
     },
     testimonials: {
       title: 'Los artistas están prosperando con Manantial Blanco',

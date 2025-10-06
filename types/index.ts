@@ -83,6 +83,7 @@ export interface Dictionary {
     whyCulturalIP: {
       title: string;
       description: string;
+      description2: string;
     };
     testimonials: {
       title: string;
