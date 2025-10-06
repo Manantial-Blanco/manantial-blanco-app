@@ -69,8 +69,8 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
       {/* Main Content */}
       <div className="flex-1 py-8">
         <div className="container mx-auto px-8">
-          <div className="bg-white rounded-lg shadow-sm max-w-5xl mx-auto">
-            <div ref={sectionRef} className="transition-all duration-300 ease-in-out">
+          <div className="bg-white rounded-lg shadow-sm max-w-5xl mx-auto relative">
+            <div ref={sectionRef} className="transition-all duration-300 ease-in-out pb-24">
               {/* Step 1: Name */}
               {currentStep === 1 && (
                 <div className="wizard-section min-h-[400px] flex items-center justify-center px-12 py-16">
@@ -234,79 +234,159 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
 
               {/* Step 7: Summary */}
               {currentStep === 7 && (
-                <div className="wizard-section min-h-[400px] flex items-center justify-center px-12 py-16">
-                  <div className="w-full max-w-2xl">
+                <div className="wizard-section min-h-[400px] px-12 py-16">
+                  <div className="w-full max-w-2xl mx-auto">
                     <h2 className="text-2xl font-semibold text-black text-center mb-8">
                       Review your submission
                     </h2>
                     
                     <div className="space-y-6">
+                      {/* Piece Name - Editable */}
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-600 mb-2">Piece Name</h3>
-                        <p className="text-base text-black">{formData.name || 'Not provided'}</p>
+                        <label className="block text-sm font-semibold text-gray-600 mb-2">
+                          Piece Name
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.name}
+                          onChange={(e) => updateFormData('name', e.target.value)}
+                          maxLength={30}
+                          className="w-full px-6 py-4 border border-gray-300 rounded-lg text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
                       </div>
 
-                      {formData.imagePreview && (
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-600 mb-2">Artwork Image</h3>
-                          <img 
-                            src={formData.imagePreview} 
-                            alt="Artwork preview" 
-                            className="w-48 h-48 object-cover rounded-lg border border-gray-200"
-                          />
+                      {/* Image Upload - Editable */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-600 mb-2">
+                          Artwork Image
+                        </label>
+                        <ImageUpload onUpload={handleImageUpload} currentImage={formData.imagePreview} />
+                      </div>
+
+                      {/* Description - Editable */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-600 mb-2">
+                          Description
+                        </label>
+                        <textarea
+                          value={formData.description}
+                          onChange={(e) => updateFormData('description', e.target.value)}
+                          rows={4}
+                          className="w-full px-6 py-4 border border-gray-300 rounded-lg text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        />
+                      </div>
+
+                      {/* License Price - Editable */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-600 mb-2">
+                          License price
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="Enter amount (USD)"
+                          value={formData.licensePrice}
+                          onChange={(e) => updateFormData('licensePrice', e.target.value)}
+                          min="0"
+                          step="0.01"
+                          className="w-full px-6 py-4 border border-gray-300 rounded-lg text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      {/* Carrier Community - Editable */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-600 mb-2">
+                          Carrier Community
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={formData.carrierCommunity}
+                            onChange={(e) => updateFormData('carrierCommunity', e.target.value)}
+                            className="w-full px-6 py-4 border border-gray-300 rounded-lg text-base text-black appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                          >
+                            <option value="">Select</option>
+                            <option value="Alebrijes">Alebrijes</option>
+                            <option value="Other">Other</option>
+                          </select>
+                          <svg 
+                            className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" 
+                            width="20" 
+                            height="20" 
+                            viewBox="0 0 20 20" 
+                            fill="none"
+                          >
+                            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
                         </div>
-                      )}
-
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-600 mb-2">Description</h3>
-                        <p className="text-base text-black">{formData.description || 'Not provided'}</p>
                       </div>
 
+                      {/* Remix Permissions - Editable */}
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-600 mb-2">License Price</h3>
-                        <p className="text-base text-black">{formData.licensePrice ? `$${formData.licensePrice} USD` : 'Not provided'}</p>
+                        <label className="block text-sm font-semibold text-gray-600 mb-2">
+                          Remix permissions
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={formData.remixPermissions}
+                            onChange={(e) => updateFormData('remixPermissions', e.target.value)}
+                            className="w-full px-6 py-4 border border-gray-300 rounded-lg text-base text-black appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                          >
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                          <svg 
+                            className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" 
+                            width="20" 
+                            height="20" 
+                            viewBox="0 0 20 20" 
+                            fill="none"
+                          >
+                            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
                       </div>
 
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-600 mb-2">Carrier Community</h3>
-                        <p className="text-base text-black">{formData.carrierCommunity || 'Not provided'}</p>
-                      </div>
-
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-600 mb-2">Remix Permissions</h3>
-                        <p className="text-base text-black">{formData.remixPermissions || 'Not provided'}</p>
+                      {/* Terms and Conditions */}
+                      <div className="pt-4">
+                        <p className="text-center text-sm text-gray-600">
+                          By clicking Submit, you acknowledge that you have read, understood, and agree to be bound by the{' '}
+                          <a href="#" className="text-blue-600 underline hover:text-blue-700">
+                            Terms and Conditions
+                          </a>
+                          {' '}of Manantial Blanco.
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Progress Bar and Next Button */}
-      <div className="bg-white border-t">
-        <div className="container mx-auto px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{currentStep} out of {totalSteps}</span>
-            <div className="w-80 h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-blue-600 transition-all duration-300 rounded-full"
-                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-              />
+            {/* Progress Bar and Next Button - Fixed to wizard container */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white border-t">
+              <div className="py-4 px-12 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-gray-600">{currentStep} out of {totalSteps}</span>
+                  <div className="w-80 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-blue-600 transition-all duration-300 rounded-full"
+                      style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                    />
+                  </div>
+                </div>
+                
+                <button
+                  onClick={currentStep === totalSteps ? () => {
+                    // Handle final submission
+                    console.log('Submitting:', formData);
+                  } : handleNext}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors font-medium"
+                >
+                  {currentStep === totalSteps ? 'Submit' : 'Next'}
+                </button>
+              </div>
             </div>
           </div>
-          
-          <button
-            onClick={currentStep === totalSteps ? () => {
-              // Handle final submission
-              console.log('Submitting:', formData);
-            } : handleNext}
-            className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors font-medium"
-          >
-            {currentStep === totalSteps ? 'Submit Registration' : 'Next'}
-          </button>
         </div>
       </div>
     </div>
