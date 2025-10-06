@@ -7,8 +7,6 @@ import Image from 'next/image';
 import { Dictionary, Locale } from '@/types';
 import { LanguageDropdown } from '@/components/layout/LanguageDropdown';
 import { WalletUserButton } from '@/components/layout/WalletUserButton';
-import { WalletAuthRedirect } from '@/components/auth/WalletAuthRedirect';
-import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 
 interface LandingUIProps {
   dict: Dictionary;
@@ -106,7 +104,6 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background font-sans">
-      <WalletAuthRedirect lang={lang} />
       <style jsx>{`
         .nav-link {
           font-weight: 500;
