@@ -195,7 +195,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
           backgroundPosition: 'center',
         }}
       >
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/20" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 
             className="mb-4"
@@ -206,21 +206,39 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
               lineHeight: '90px',
               letterSpacing: '-2%',
               textAlign: 'center',
-              verticalAlign: 'middle'
+              verticalAlign: 'middle',
+              color: '#F1E7D3'
             }}
           >
             {dict.landing.heroTitle}
           </h1>
-          <p className="text-lg sm:text-xl max-w-2xl mx-auto mb-8">
+          <p 
+            className="max-w-2xl mx-auto mb-8"
+            style={{
+              fontWeight: 400,
+              fontStyle: 'Regular',
+              fontSize: '24px',
+              lineHeight: '26px',
+              letterSpacing: '-2%',
+              textAlign: 'center',
+              verticalAlign: 'middle'
+            }}
+          >
             {dict.landing.heroDescription}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             {/* Register Your Cultural IP Button (Connect Wallet) */}
             <button
               onClick={() => open()}
-              className="px-8 py-4 bg-gradient-to-r from-amber-100 to-orange-100 text-amber-900 rounded-full text-base font-semibold border-2 border-amber-200 hover:from-amber-200 hover:to-orange-200 hover:border-amber-300 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-8 py-4 bg-transparent rounded-full border-2 border-white/30 hover:bg-white/10 hover:border-white/50 transition-all duration-300"
               style={{
-                boxShadow: '0 8px 32px rgba(251, 191, 36, 0.3)',
+                fontFamily: 'Public Sans',
+                fontWeight: 500,
+                fontStyle: 'normal',
+                fontSize: '24px',
+                lineHeight: '20px',
+                letterSpacing: '0%',
+                color: '#F1E7D3'
               }}
               aria-label={isConnected ? 'Wallet connected' : 'Connect wallet to register your cultural IP'}
             >
@@ -230,9 +248,15 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
             {/* Work with Authentic Cultural IP Button (Explore Licensed Art) */}
             <a
               href="#catalog"
-              className="px-8 py-4 bg-gradient-to-r from-stone-100 to-amber-50 text-amber-900 rounded-full text-base font-semibold border-2 border-stone-200 hover:from-stone-200 hover:to-amber-100 hover:border-stone-300 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-8 py-4 text-black rounded-full transition-all duration-300"
               style={{
-                boxShadow: '0 8px 32px rgba(120, 113, 108, 0.2)',
+                backgroundColor: '#F1E7D3',
+                fontFamily: 'Public Sans',
+                fontWeight: 500,
+                fontStyle: 'normal',
+                fontSize: '24px',
+                lineHeight: '20px',
+                letterSpacing: '0%'
               }}
             >
               Work with Authentic Cultural IP
