@@ -136,10 +136,6 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
               <Link href={`/${lang}/landing`} className="text-sm hover:text-accent transition-colors">
                 {dict.common.home}
               </Link>
-              <Link href={`/${lang}/login`} className="text-sm flex items-center gap-1 hover:text-accent transition-colors">
-                {dict.landing.registerCTA}
-                <ChevronDown className="w-4 h-4" />
-              </Link>
               <a href="#catalog" className="text-sm flex items-center gap-1 hover:text-accent transition-colors">
                 {dict.landing.exploreCTA}
                 <ChevronDown className="w-4 h-4" />
@@ -157,9 +153,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
             <div className="flex items-center gap-4">
               <LanguageSwitcher currentLang={lang} />
               <Search className="w-5 h-5 cursor-pointer hover:text-accent transition-colors" aria-label="Search" />
-              <Link href={`/${lang}/login`}>
-                <User className="w-5 h-5 cursor-pointer hover:text-accent transition-colors" aria-label="User account" />
-              </Link>
+              <appkit-button />
               <ShoppingBag className="w-5 h-5 cursor-pointer hover:text-accent transition-colors" aria-label="Shopping bag" />
             </div>
           </div>
@@ -184,12 +178,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
             {dict.landing.heroDescription}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href={`/${lang}/login`}
-              className="px-6 py-3 border border-accent rounded-md text-accent text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-all"
-            >
-              {dict.landing.registerCTA}
-            </Link>
+            <appkit-button />
             <a
               href="#catalog"
               className="px-6 py-3 bg-accent rounded-md text-accent-foreground text-sm font-medium hover:bg-opacity-90 transition-all"
