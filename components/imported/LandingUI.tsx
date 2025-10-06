@@ -257,7 +257,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             {displayPieces.map((piece) => (
               <Link key={piece.id} href={`/${lang}/piece/${piece.id}`} className="group">
                 <div className="relative aspect-square w-full overflow-hidden rounded-md bg-secondary">
