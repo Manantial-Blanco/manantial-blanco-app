@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, X, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -84,6 +84,184 @@ const CategoryButton = ({ icon, text }: { icon: string; text: string }) => (
   </button>
 );
 
+const TestimonialsCarousel = ({ testimonials }: { testimonials: Array<{ name: string; profession: string; quote: string; img: string }> }) => {
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  // Create many duplicated testimonials for extended scroll (about 5 minutes)
+  // At 320px per card and 0.5px per frame at 60fps = 30px/sec = 1800px/min
+  // For 5 minutes we need about 9000px, so ~30 cards = 10 sets of 3 testimonials
+  const duplicatedTestimonials = Array(10).fill(testimonials).flat();
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    let animationId: number;
+    let scrollTimeout: NodeJS.Timeout;
+    let isUserInteracting = false;
+
+    const itemWidth = 320; // width of each testimonial card + gap
+    const originalSetWidth = itemWidth * testimonials.length;
+    const totalWidth = itemWidth * duplicatedTestimonials.length;
+
+    // Set initial scroll position to a safe starting point
+    carousel.scrollLeft = originalSetWidth * 2;
+
+    const autoScroll = () => {
+      if (!isUserInteracting && carousel) {
+        carousel.scrollLeft += 0.5; // Very slow, smooth scrolling
+        
+        const scrollLeft = carousel.scrollLeft;
+        
+        // Reset to beginning when we get close to the end (leave some buffer)
+        if (scrollLeft >= totalWidth - (originalSetWidth * 2)) {
+          carousel.scrollLeft = originalSetWidth * 2;
+        }
+      }
+      animationId = requestAnimationFrame(autoScroll);
+    };
+
+    const handleMouseEnter = () => {
+      isUserInteracting = true;
+    };
+
+    const handleMouseLeave = () => {
+      isUserInteracting = false;
+    };
+
+    const handleScroll = () => {
+      setIsScrolling(true);
+      clearTimeout(scrollTimeout);
+      
+      scrollTimeout = setTimeout(() => {
+        setIsScrolling(false);
+      }, 150);
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      isUserInteracting = true;
+      carousel.scrollLeft += e.deltaY;
+      
+      // Resume auto-scroll after 2 seconds of no interaction
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isUserInteracting = false;
+      }, 2000);
+    };
+
+    const handleTouchStart = () => {
+      isUserInteracting = true;
+    };
+
+    const handleTouchEnd = () => {
+      // Resume auto-scroll after 2 seconds of no interaction
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isUserInteracting = false;
+      }, 2000);
+    };
+
+    // Start auto-scroll
+    animationId = requestAnimationFrame(autoScroll);
+
+    // Add event listeners
+    carousel.addEventListener('scroll', handleScroll);
+    carousel.addEventListener('wheel', handleWheel, { passive: false });
+    carousel.addEventListener('mouseenter', handleMouseEnter);
+    carousel.addEventListener('mouseleave', handleMouseLeave);
+    carousel.addEventListener('touchstart', handleTouchStart);
+    carousel.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      cancelAnimationFrame(animationId);
+      carousel.removeEventListener('scroll', handleScroll);
+      carousel.removeEventListener('wheel', handleWheel);
+      carousel.removeEventListener('mouseenter', handleMouseEnter);
+      carousel.removeEventListener('mouseleave', handleMouseLeave);
+      carousel.removeEventListener('touchstart', handleTouchStart);
+      carousel.removeEventListener('touchend', handleTouchEnd);
+      clearTimeout(scrollTimeout);
+    };
+  }, [testimonials.length]);
+
+  const TestimonialCard = ({ testimonial, index }: { testimonial: { name: string; profession: string; quote: string; img: string }, index: number }) => (
+    <div key={index} className="flex-shrink-0 w-80 bg-white border border-gray-200 rounded-lg p-8 flex flex-col">
+      <div className="flex items-start gap-6 mb-6">
+        <Image
+          src={testimonial.img}
+          alt={testimonial.name}
+          width={80}
+          height={80}
+          className="w-20 h-20 rounded-full object-cover"
+        />
+        <div className="flex-1">
+          <h4 
+            className="text-black mb-1"
+            style={{
+              fontFamily: 'Plus Jakarta Sans',
+              fontWeight: 700,
+              fontStyle: 'normal',
+              fontSize: '15px',
+              lineHeight: '20px',
+              letterSpacing: '0%'
+            }}
+          >
+            {testimonial.name}
+          </h4>
+          <p 
+            className="text-gray-500"
+            style={{
+              fontFamily: 'Plus Jakarta Sans',
+              fontWeight: 500,
+              fontStyle: 'normal',
+              fontSize: '15px',
+              lineHeight: '20px',
+              letterSpacing: '0%'
+            }}
+          >
+            {testimonial.profession}
+          </p>
+        </div>
+      </div>
+      <div className="flex gap-4">
+        <div className="w-1 bg-black flex-shrink-0"></div>
+        <p 
+          className="text-gray-800 leading-relaxed"
+          style={{
+            fontFamily: 'Plus Jakarta Sans',
+            fontWeight: 500,
+            fontStyle: 'normal',
+            fontSize: '20px',
+            lineHeight: '24px',
+            letterSpacing: '0%'
+          }}
+        >
+          {testimonial.quote}
+        </p>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="overflow-hidden">
+      <div 
+        ref={carouselRef}
+        className="flex gap-6 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden"
+        style={{ 
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
+      >
+        {duplicatedTestimonials.map((testimonial, index) => (
+          <TestimonialCard key={index} testimonial={testimonial} index={index} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
   const [showBanner, setShowBanner] = useState(true);
   const { open } = useAppKit();
@@ -102,23 +280,21 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
   const testimonials = [
     {
       name: 'Celestino Marquez',
+      profession: 'Ceramic Artist',
       quote: 'Thanks to Manantial Blanco, my art sales have tripled!',
-      img: '/testimonial-1.png',
+      img: '/images/testimonials/celestino-marquez.png',
     },
     {
       name: 'Lysandra Velez',
+      profession: 'Textile Designer',
       quote: 'I can finally focus on creating while Manantial Blanco handles the rest.',
-      img: '/testimonial-2.png',
+      img: '/images/testimonials/lysandra-velez.png',
     },
     {
       name: 'Joaquin Fierro',
+      profession: 'Sculptor',
       quote: 'The best platform for artists to monetize their work.',
-      img: '/testimonial-3.png',
-    },
-    {
-      name: 'Isabella Rios',
-      quote: 'Thanks to Manantial Blanco, my art sales have tripled!',
-      img: '/testimonial-1.png',
+      img: '/images/testimonials/joaquin-fierro.png',
     },
   ];
 
@@ -367,28 +543,21 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
       {/* Testimonials */}
       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-8">
+          <h2 
+            className="mb-8"
+            style={{
+              fontFamily: 'Plus Jakarta Sans',
+              fontWeight: 700,
+              fontStyle: 'normal',
+              fontSize: '48px',
+              lineHeight: '52px',
+              letterSpacing: '-1%',
+              textAlign: 'center'
+            }}
+          >
             {dict.landing.testimonials.title}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {testimonials.map((testimonial, i) => (
-              <div key={i} className="border rounded-md p-6 flex flex-col">
-                <div className="flex items-center gap-4 mb-4">
-                  <Image
-                    src={testimonial.img}
-                    alt={testimonial.name}
-                    width={40}
-                    height={40}
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <div>
-                    <h4 className="font-semibold text-sm">{testimonial.name}</h4>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground">{testimonial.quote}</p>
-              </div>
-            ))}
-          </div>
+          <TestimonialsCarousel testimonials={testimonials} />
         </div>
       </section>
     </div>
