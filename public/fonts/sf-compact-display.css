@@ -1,0 +1,49 @@
+/* SF Compact Display Font Face Declarations */
+
+/* Regular */
+@font-face {
+  font-family: 'SF Compact Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('SF Compact Display Regular'),
+       local('SFCompactDisplay-Regular'),
+       local('-apple-system'),
+       url('/fonts/sf-compact-display-regular.woff2') format('woff2');
+}
+
+/* Medium */
+@font-face {
+  font-family: 'SF Compact Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local('SF Compact Display Medium'),
+       local('SFCompactDisplay-Medium'),
+       local('-apple-system'),
+       url('/fonts/sf-compact-display-medium.woff2') format('woff2');
+}
+
+/* Semi Bold */
+@font-face {
+  font-family: 'SF Compact Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('SF Compact Display Semibold'),
+       local('SFCompactDisplay-Semibold'),
+       local('-apple-system'),
+       url('/fonts/sf-compact-display-semibold.woff2') format('woff2');
+}
+
+/* Bold */
+@font-face {
+  font-family: 'SF Compact Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('SF Compact Display Bold'),
+       local('SFCompactDisplay-Bold'),
+       local('-apple-system'),
+       url('/fonts/sf-compact-display-bold.woff2') format('woff2');
+}

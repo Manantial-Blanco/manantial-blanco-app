@@ -1,6 +1,7 @@
 import './globals.css';
 import { AppKitProvider } from '@/components/providers/AppKitProvider';
 import { headers } from 'next/headers';
+import { systemFont } from '@/lib/fonts';
 
 export const metadata = {
   title: 'Manantial Blanco - Cultural IP Platform',
@@ -16,8 +17,8 @@ export default async function RootLayout({
   const cookies = headersObj.get('cookie');
 
   return (
-    <html suppressHydrationWarning>
-      <body>
+    <html suppressHydrationWarning className={systemFont.variable}>
+      <body className={systemFont.className}>
         <AppKitProvider cookies={cookies}>{children}</AppKitProvider>
       </body>
     </html>
