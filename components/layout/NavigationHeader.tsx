@@ -4,6 +4,7 @@ import { Search, X, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Dictionary, Locale } from '@/types';
+import { useAppKitAccount } from '@reown/appkit/react';
 import { LanguageDropdown } from '@/components/layout/LanguageDropdown';
 import { WalletUserButton } from '@/components/layout/WalletUserButton';
 
@@ -20,6 +21,7 @@ export function NavigationHeader({
   showPromoBar = false, 
   onClosePromoBar 
 }: NavigationHeaderProps) {
+  const { isConnected } = useAppKitAccount();
   return (
     <>
       <style jsx>{`
@@ -69,7 +71,7 @@ export function NavigationHeader({
 
             {/* Navigation Links - Desktop */}
             <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-              <Link href={`/${lang}/login`} className="nav-link flex items-center gap-1 hover:text-accent transition-colors">
+              <Link href={isConnected ? `/${lang}/home` : `/${lang}/login`} className="nav-link flex items-center gap-1 hover:text-accent transition-colors">
                 {dict.landing.registerCTA}
                 <ChevronDown className="w-4 h-4" />
               </Link>
