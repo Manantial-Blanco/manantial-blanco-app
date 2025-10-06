@@ -184,7 +184,7 @@ const TestimonialsCarousel = ({ testimonials }: { testimonials: Array<{ name: st
       carousel.removeEventListener('touchend', handleTouchEnd);
       clearTimeout(scrollTimeout);
     };
-  }, [testimonials.length]);
+  }, [testimonials.length, duplicatedTestimonials.length]);
 
   const TestimonialCard = ({ testimonial, index }: { testimonial: { name: string; profession: string; quote: string; img: string }, index: number }) => (
     <div key={index} className="flex-shrink-0 w-80 bg-white border border-gray-200 rounded-lg p-8 flex flex-col">

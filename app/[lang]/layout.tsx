@@ -7,20 +7,22 @@ export async function generateStaticParams() {
   return [{ lang: 'en' }, { lang: 'es' }];
 }
 
-export default async function LangLayout({
-  children,
-  params,
-}: {
+interface LangLayoutProps {
   children: React.ReactNode;
-  params: { lang: Locale };
-}) {
-  const { lang } = params;
+  params: Promise<{ lang: string }>;
+}
+
+export default async function LangLayout({ children, params }: LangLayoutProps) {
+  const { lang } = await params;
 
   if (!isValidLocale(lang)) {
     notFound();
   }
 
-  const dict = await getDictionary(lang);
+  // Type assertion after validation
+  const validLang = lang as Locale;
+
+  const dict = await getDictionary(validLang);
 
   return (
     <div className="flex flex-col min-h-screen">
