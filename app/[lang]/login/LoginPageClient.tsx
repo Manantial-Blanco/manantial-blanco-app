@@ -4,8 +4,15 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { Dictionary, Locale } from '@/types';
+import { NavigationHeader } from '@/components/layout/NavigationHeader';
 
-export default function LoginPageClient({ lang }: { lang: string }) {
+interface LoginPageClientProps {
+  lang: Locale;
+  dict: Dictionary;
+}
+
+export default function LoginPageClient({ lang, dict }: LoginPageClientProps) {
   const router = useRouter();
   const { open } = useAppKit();
   const { address, isConnected } = useAppKitAccount();
@@ -45,42 +52,45 @@ export default function LoginPageClient({ lang }: { lang: string }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black">
-      <div className="max-w-md w-full mx-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-black mb-2">
-              Welcome to Manantial Blanco
-            </h1>
-            <p className="text-gray-600">
-              Connect your wallet to get started
-            </p>
-          </div>
+    <>
+      <NavigationHeader lang={lang} dict={dict} />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black">
+        <div className="max-w-md w-full mx-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-8">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-black mb-2">
+                Welcome to Manantial Blanco
+              </h1>
+              <p className="text-gray-600">
+                Connect your wallet to get started
+              </p>
+            </div>
 
-          <button
-            onClick={handleConnect}
-            className="w-full py-4 px-6 bg-black text-white rounded-full font-semibold text-lg hover:bg-gray-800 transition-colors"
-          >
-            Connect Wallet
-          </button>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500">
-              By connecting, you agree to our Terms of Service and Privacy
-              Policy
-            </p>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <a
-              href={`/${lang}/landing`}
-              className="text-sm text-gray-600 hover:text-black transition-colors"
+            <button
+              onClick={handleConnect}
+              className="w-full py-4 px-6 bg-black text-white rounded-full font-semibold text-lg hover:bg-gray-800 transition-colors"
             >
-              ← Back to Landing Page
-            </a>
+              Connect Wallet
+            </button>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-500">
+                By connecting, you agree to our Terms of Service and Privacy
+                Policy
+              </p>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <a
+                href={`/${lang}/landing`}
+                className="text-sm text-gray-600 hover:text-black transition-colors"
+              >
+                ← Back to Landing Page
+              </a>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
