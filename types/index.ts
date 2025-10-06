@@ -109,6 +109,12 @@ export interface Dictionary {
     disconnect: string;
     signIn: string;
     signOut: string;
+    welcome: string;
+    getStarted: string;
+    termsAgreement: string;
+    backToLanding: string;
+    walletConnected: string;
+    connectToRegister: string;
   };
   pieces: {
     registerNew: string;
