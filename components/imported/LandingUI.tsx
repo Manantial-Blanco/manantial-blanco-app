@@ -8,6 +8,7 @@ import { Dictionary, Locale } from '@/types';
 import { LanguageDropdown } from '@/components/layout/LanguageDropdown';
 import { WalletUserButton } from '@/components/layout/WalletUserButton';
 import { WalletAuthRedirect } from '@/components/auth/WalletAuthRedirect';
+import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 
 interface LandingUIProps {
   dict: Dictionary;
@@ -68,6 +69,8 @@ const CategoryButton = ({ icon, text }: { icon: string; text: string }) => (
 
 export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
   const [showBanner, setShowBanner] = useState(true);
+  const { open } = useAppKit();
+  const { address, isConnected } = useAppKitAccount();
 
   const displayPieces = pieces.length > 0 
     ? pieces 
@@ -106,14 +109,12 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
       <WalletAuthRedirect lang={lang} />
       <style jsx>{`
         .nav-link {
-          font-family: 'SF Compact Display', sans-serif;
           font-weight: 500;
           font-size: 15px;
           line-height: 20px;
           letter-spacing: 0%;
         }
           .promo-banner-text {
-            font-family: 'SF Compact Display', sans-serif;
             font-weight: 500;
             font-size: 13px;
             line-height: 16px;
@@ -196,19 +197,45 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
       >
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight mb-4">
+          <h1 
+            className="mb-4"
+            style={{
+              fontWeight: 600,
+              fontStyle: 'normal',
+              fontSize: '90px',
+              lineHeight: '90px',
+              letterSpacing: '-2%',
+              textAlign: 'center',
+              verticalAlign: 'middle'
+            }}
+          >
             {dict.landing.heroTitle}
           </h1>
           <p className="text-lg sm:text-xl max-w-2xl mx-auto mb-8">
             {dict.landing.heroDescription}
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <appkit-button />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            {/* Register Your Cultural IP Button (Connect Wallet) */}
+            <button
+              onClick={() => open()}
+              className="px-8 py-4 bg-gradient-to-r from-amber-100 to-orange-100 text-amber-900 rounded-full text-base font-semibold border-2 border-amber-200 hover:from-amber-200 hover:to-orange-200 hover:border-amber-300 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              style={{
+                boxShadow: '0 8px 32px rgba(251, 191, 36, 0.3)',
+              }}
+              aria-label={isConnected ? 'Wallet connected' : 'Connect wallet to register your cultural IP'}
+            >
+              {isConnected ? 'Register Your Cultural IP' : 'Register Your Cultural IP'}
+            </button>
+            
+            {/* Work with Authentic Cultural IP Button (Explore Licensed Art) */}
             <a
               href="#catalog"
-              className="px-6 py-3 bg-accent rounded-md text-accent-foreground text-sm font-medium hover:bg-opacity-90 transition-all"
+              className="px-8 py-4 bg-gradient-to-r from-stone-100 to-amber-50 text-amber-900 rounded-full text-base font-semibold border-2 border-stone-200 hover:from-stone-200 hover:to-amber-100 hover:border-stone-300 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              style={{
+                boxShadow: '0 8px 32px rgba(120, 113, 108, 0.2)',
+              }}
             >
-              {dict.landing.exploreCTA}
+              Work with Authentic Cultural IP
             </a>
           </div>
         </div>
