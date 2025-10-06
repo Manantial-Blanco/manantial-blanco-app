@@ -19,9 +19,5 @@ export default async function LangLayout({
     notFound();
   }
 
-  return (
-    <html lang={lang}>
-      <body>{children}</body>
-    </html>
-  );
+  return <>{children}</>;
 }
