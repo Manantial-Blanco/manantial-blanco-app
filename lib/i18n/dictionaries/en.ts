@@ -81,6 +81,12 @@ export const en: Dictionary = {
     disconnect: 'Disconnect',
     signIn: 'Sign In',
     signOut: 'Sign Out',
+    welcome: 'Welcome to Manantial Blanco',
+    getStarted: 'Connect your wallet to get started',
+    termsAgreement: 'By connecting, you agree to our Terms of Service and Privacy Policy',
+    backToLanding: '← Back to Landing Page',
+    walletConnected: 'Wallet connected',
+    connectToRegister: 'Connect wallet to register your cultural IP',
   },
   pieces: {
     registerNew: 'Register New Piece',

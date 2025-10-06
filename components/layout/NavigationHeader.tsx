@@ -96,7 +96,7 @@ export function NavigationHeader({
               >
                 <Search className="w-5 h-5" />
               </button>
-              <WalletUserButton />
+              <WalletUserButton dict={dict} />
               <LanguageDropdown currentLang={lang} />
             </div>
           </div>

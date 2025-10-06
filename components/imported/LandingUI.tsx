@@ -356,9 +356,9 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
                 letterSpacing: '0%',
                 color: '#F1E7D3'
               }}
-              aria-label={isConnected ? 'Wallet connected' : 'Connect wallet to register your cultural IP'}
+              aria-label={isConnected ? dict.auth.walletConnected : dict.auth.connectToRegister}
             >
-              {isConnected ? 'Register Your Cultural IP' : 'Register Your Cultural IP'}
+              {dict.landing.registerCTA}
             </button>
             
             {/* Work with Authentic Cultural IP Button (Explore Licensed Art) */}
