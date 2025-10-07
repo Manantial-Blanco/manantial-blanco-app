@@ -1,7 +1,7 @@
 import { getDictionary, isValidLocale } from '@/lib/i18n/getDict';
 import { Locale } from '@/types';
 import { notFound } from 'next/navigation';
-import LandingUI from '@/components/imported/LandingUI';
+import dynamic from 'next/dynamic';
 import { Address } from 'viem';
 
 // Story Protocol API Configuration

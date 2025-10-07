@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dictionary, Locale } from '@/types';
 import { NavigationHeader } from '@/components/layout/NavigationHeader';
 import ImageUpload from '@/components/ui/ImageUpload';
+import SuccessModal from '@/components/ui/SuccessModal';
 import { PRIMARY_COLOR, PRIMARY_COLOR_HOVER } from '@/lib/constants/colors';
 
 interface RegisterPieceClientProps {
@@ -33,6 +34,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
 
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const totalSteps = 6;
 
@@ -121,11 +123,22 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
     };
     
     console.log('Form submission data:', JSON.stringify(submissionData, null, 2));
+    
+    // Show success modal
+    setShowSuccessModal(true);
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-[#E8E8E8]">
-      <NavigationHeader lang={lang} dict={dict} showPromoBar={false} onClosePromoBar={() => {}} />
+    <>
+      <SuccessModal 
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="Success"
+        message="Your artwork has been registered successfully!"
+      />
+      
+      <div className="min-h-screen w-full flex flex-col bg-[#E8E8E8]">
+        <NavigationHeader lang={lang} dict={dict} showPromoBar={false} onClosePromoBar={() => {}} />
 
       {/* Page Title */}
       <div className="bg-white border-b border-gray-200">
@@ -408,5 +421,6 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
         </div>
       </div>
     </div>
+    </>
   );
 }

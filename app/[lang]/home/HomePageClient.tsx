@@ -44,15 +44,6 @@ interface DashboardData {
   pieces: Piece[];
 }
 
-// Components
-function StatusIcon({ status }: { status: Status }) {
-  return status === 'pending' ? (
-    <ClockIcon className="h-6 w-6 text-orange-500" />
-  ) : (
-    <CheckIcon className="h-6 w-6 text-green-500" />
-  );
-}
-
 interface HomePageClientProps {
   lang: Locale;
   dict: Dictionary;
@@ -211,7 +202,11 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
                 </div>
                 <div className="flex items-center gap-4">
                   <p className="font-semibold text-black">{movement.amount}</p>
-                  <StatusIcon status={movement.status} />
+                  {movement.status === 'pending' ? (
+                    <ClockIcon className="h-6 w-6 text-orange-500" />
+                  ) : (
+                    <CheckIcon className="h-6 w-6 text-green-500" />
+                  )}
                 </div>
               </div>
             ))}
@@ -268,7 +263,11 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
                   <span className="font-semibold text-black">{piece.perks}</span>
                 </div>
                 <div className="flex justify-end items-center gap-4">
-                  <StatusIcon status={piece.status} />
+                {piece.status === 'pending' ? (
+                    <ClockIcon className="h-6 w-6 text-orange-500" />
+                  ) : (
+                    <CheckIcon className="h-6 w-6 text-green-500" />
+                  )}
                   <Button variant="ghost" size="icon">
                     <MoreHorizontalIcon className="h-5 w-5" />
                   </Button>
