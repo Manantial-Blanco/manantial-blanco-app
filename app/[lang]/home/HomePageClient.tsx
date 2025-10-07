@@ -111,7 +111,7 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
                 Please connect your wallet to view your artist dashboard and IP assets from Story Protocol.
               </p>
               <p className="text-sm text-gray-500">
-                Click the "Connect Wallet" button in the navigation header to get started.
+                Click the &quot;Connect Wallet&quot; button in the navigation header to get started.
               </p>
             </div>
           </div>
