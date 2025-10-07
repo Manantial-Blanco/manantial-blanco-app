@@ -306,7 +306,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
       <section
         className="relative w-full max-w-full overflow-hidden h-[400px] sm:h-[500px] lg:h-[600px] flex items-center justify-center text-center text-white"
         style={{
-          backgroundImage: "url('/images/hero-background.png?width=2886')",
+          backgroundImage: "url('/images/hero-mb-wide.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
