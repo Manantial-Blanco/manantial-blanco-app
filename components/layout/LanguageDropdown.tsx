@@ -91,7 +91,7 @@ export function LanguageDropdown({ currentLang }: { currentLang: Locale }) {
         <button
           key={option.lang}
           onClick={() => switchLanguage(option.lang)}
-          className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-100 transition-colors ${
+          className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-100 transition-colors cursor-pointer ${
             option.lang === currentLang ? 'bg-gray-50 font-medium' : ''
           }`}
         >
@@ -108,7 +108,7 @@ export function LanguageDropdown({ currentLang }: { currentLang: Locale }) {
       <button
         ref={buttonRef}
         onClick={handleToggleDropdown}
-        className="flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors"
+        className="flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
         aria-label="Change language"
       >
         <Globe className="w-5 h-5" />
