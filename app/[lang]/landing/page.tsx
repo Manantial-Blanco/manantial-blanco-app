@@ -1,8 +1,19 @@
 import { getDictionary, isValidLocale } from '@/lib/i18n/getDict';
 import { Locale } from '@/types';
 import { notFound } from 'next/navigation';
-import LandingUI from '@/components/imported/LandingUI';
+import dynamic from 'next/dynamic';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+
+// Dynamic import for large LandingUI component (584 lines with inline SVGs)
+// This improves initial page load performance
+const LandingUI = dynamic(() => import('@/components/imported/LandingUI'), {
+  loading: () => (
+    <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="animate-pulse text-white text-xl">Loading...</div>
+    </div>
+  ),
+  ssr: true, // Still render on server for SEO
+});
 
 export default async function LandingPage({
   params,

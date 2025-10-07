@@ -1,15 +1,15 @@
 # Manantial Blanco Portal
 
-A Next.js application for registering and browsing artists' intellectual property ("Pieces"). This platform integrates Story Protocol for tokenization, Reown AppKit for authentication, and Supabase for data storage.
+A Next.js application for registering and browsing artists' intellectual property ("Pieces"). This platform integrates Reown AppKit for authentication and Supabase for data storage.
 
 ## Features
 
-- 🎨 **Register Art IP**: Protect your creative work with blockchain-based ownership
+- 🎨 **Register Art IP**: Protect your creative work with provenance tracking
 - 🔄 **Remix Art**: Create derivative works while respecting original creators' rights
-- 💰 **Monetization**: Automatic royalty payments through smart contracts
 - 🌍 **i18n Support**: English and Spanish language support
 - 🔐 **Wallet Authentication**: Connect via Reown AppKit
-- 📦 **Decentralized Storage**: Story Protocol integration for asset storage
+- ⚡ **Optimized Performance**: Advanced bundle splitting and code optimization
+- 📊 **Bundle Analysis**: Built-in tools for monitoring app performance
 
 ## Tech Stack
 
@@ -17,9 +17,9 @@ A Next.js application for registering and browsing artists' intellectual propert
 - **Styling**: Tailwind CSS
 - **Database**: Supabase (PostgreSQL with RLS)
 - **Authentication**: Reown AppKit (wallet-based)
-- **Blockchain**: Story Protocol SDK
 - **Testing**: Vitest + React Testing Library
 - **i18n**: Custom dictionary-based system (en/es)
+- **Build Tools**: Bundle Analyzer, Webpack optimizations
 
 ## Project Structure
 
@@ -65,10 +65,8 @@ Required environment variables:
 - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anonymous key
 - `NEXT_PUBLIC_REOWN_PROJECT_ID` - Your Reown AppKit project ID
-- `NEXT_PUBLIC_STORY_API_URL` - Story Protocol API URL
-- `STORY_API_KEY` - Story Protocol API key
 
-**Note**: The app will run with placeholder/stub functionality if credentials are not provided.
+**Note**: The app will run with limited functionality if credentials are not provided.
 
 ### 3. Set Up Database
 
@@ -91,6 +89,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the application.
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
+- `npm run build:analyze` - Build with bundle analysis (opens in browser)
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm test` - Run tests with Vitest
@@ -104,21 +103,34 @@ Open [http://localhost:3000](http://localhost:3000) to see the application.
 - Search and filter functionality
 - Language switcher (EN/ES)
 
-### Register New Piece (`/[lang]/pieces/new`)
+### Register New Piece (`/[lang]/register-piece`)
 - Upload artwork image
 - Add metadata (title, description, tags)
 - Set remix permissions
-- Mint via Story Protocol (when configured)
+- Generate provenance hash for authenticity
 
 ### Piece Details (`/[lang]/piece/[id]`)
 - View artwork and metadata
-- Token information (if minted)
+- Provenance information
 - Remix option (if allowed)
 
 ### Remix Flow (`/[lang]/remix/[id]`)
 - Create derivative works
 - Automatic attribution to original
-- Separate minting for remix
+- Generate provenance chain for remixes
+
+## Performance Optimizations
+
+This app includes comprehensive bundle size optimizations:
+
+- **Bundle Analyzer**: Visualize bundle composition with `npm run build:analyze`
+- **Code Splitting**: Advanced chunk splitting for vendor, lib, and common code
+- **Dynamic Imports**: Lazy-loaded components for faster initial load
+- **Image Optimization**: AVIF/WebP formats with automatic fallbacks
+- **Production Optimizations**: Console removal, source map control, compression
+- **Tree Shaking**: Optimized imports for lucide-react and radix-ui
+
+See [docs/BUNDLE_OPTIMIZATION.md](docs/BUNDLE_OPTIMIZATION.md) for detailed information.
 
 ## Integration Status
 
@@ -128,15 +140,14 @@ Open [http://localhost:3000](http://localhost:3000) to see the application.
 - Figma UI integration with preserved styling
 - Supabase client setup
 - Database schema with RLS policies
-- Story Protocol service stubs
-- Reown AppKit service stubs
+- Reown AppKit service integration
 - Provenance hash generation
-- Basic tests
+- Comprehensive bundle optimizations
+- Component testing setup
 
 ### 🚧 Requires Configuration
 - **Supabase**: Add credentials to `.env.local` and run schema
-- **Reown AppKit**: Add project ID and implement full wallet integration
-- **Story Protocol**: Add API credentials and implement SDK calls
+- **Reown AppKit**: Add project ID for full wallet integration
 
 ## Testing
 
@@ -159,19 +170,25 @@ The application includes:
 - Keyboard navigation support
 - Focus management
 
-## External Documentation
+## Documentation
 
-- [Story Protocol SDK](https://github.com/storyprotocol/sdk/tree/main)
+### Internal Docs
+- [Bundle Optimization Guide](docs/BUNDLE_OPTIMIZATION.md) - Performance optimization strategies
+- [Database Schema](docs/sql/schema.sql) - Supabase table definitions
+
+### External Documentation
 - [Reown AppKit](https://docs.reown.com/appkit/next/core/installation)
 - [Supabase Docs](https://supabase.com/docs)
 - [Next.js App Router](https://nextjs.org/docs/app)
+- [Next.js Optimization](https://nextjs.org/docs/app/building-your-application/optimizing)
 
 ## Notes
 
-- All external service integrations use placeholder/stub implementations when credentials are not configured
 - The Figma UI has been preserved pixel-perfect with i18n integration
 - No credentials are committed to the repository
 - RLS policies are configured for secure data access
+- Bundle size is optimized for production deployment
+- All colors are centralized in `lib/constants/colors.ts` for easy theming
 
 ## License
 

@@ -4,7 +4,6 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { prepareAsset, mintPiece } from '@/lib/services/story';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { generateProvenanceHash } from '@/lib/crypto';
 import { SECONDARY_COLOR } from '@/lib/constants/colors';
@@ -76,24 +75,7 @@ export default function RemixPage({
 
       const walletAddress = '0x0000000000000000000000000000000000000000';
 
-      // Prepare asset with Story SDK
-      const { metadataUrl } = await prepareAsset({
-        file: imageFile,
-        metadata: {
-          title: formData.title,
-          description: formData.description,
-          creator: walletAddress,
-          tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
-        },
-      });
-
-      // Mint remix piece
-      const { tokenId, contract } = await mintPiece({
-        metadataUrl,
-        creatorWallet: walletAddress,
-      });
-
-      // Generate provenance hash
+      // Generate provenance hash for the remix
       const provenanceHash = await generateProvenanceHash({
         title: formData.title,
         description: formData.description,
@@ -111,7 +93,7 @@ export default function RemixPage({
           .single();
 
         if (user) {
-          // Create remix piece
+          // Create remix piece (without Story Protocol token info)
           const { data: remixPiece } = await supabase
             .from('pieces')
             .insert({
@@ -119,8 +101,6 @@ export default function RemixPage({
               description: formData.description,
               image_url: imagePreview || '',
               creator_user_id: user.id,
-              token_id: tokenId,
-              token_contract: contract,
               provenance_hash: provenanceHash,
               can_remix: false,
               tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
