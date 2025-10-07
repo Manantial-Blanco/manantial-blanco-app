@@ -31,6 +31,9 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
     remixPermissions: '',
   });
 
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
   const totalSteps = 6;
 
   useEffect(() => {
@@ -76,6 +79,34 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
 
   const handleImageUpload = (file: File, preview: string) => {
     setFormData((prev) => ({ ...prev, image: file, imagePreview: preview }));
+  };
+
+  const handleDescribeWithAI = async () => {
+    if (!formData.image) {
+      setAiError('Please upload an image first.');
+      return;
+    }
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const fd = new FormData();
+      fd.append('image', formData.image, formData.image.name);
+      fd.append('lang', String(lang));
+
+      const res = await fetch('/api/ai-describe-image', {
+        method: 'POST',
+        body: fd,
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json?.error || 'Failed to generate description');
+      }
+      updateFormData('description', json.description);
+    } catch (e: any) {
+      setAiError(e?.message || 'Something went wrong');
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const handleSubmit = () => {
@@ -157,7 +188,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                     <p className="text-center text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
                       Provide a short overview of the artwork&apos;s concept, technique, and creative intent.
                     </p>
-                    <div className="relative">
+                    <div>
                       <textarea
                         placeholder="Provide a short overview of the artwork's concept, technique, and creative intent."
                         value={formData.description}
@@ -165,13 +196,23 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                         rows={6}
                         className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91] resize-none"
                       />
-                      <button className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 flex items-center gap-2 px-2 sm:px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M7 0L8.5 4.5L13 7L8.5 9.5L7 14L5.5 9.5L1 7L5.5 4.5L7 0Z" fill="currentColor"/>
-                        </svg>
-                        Write with AI
-                      </button>
+                      <div className="flex justify-end mt-3">
+                        <button
+                          type="button"
+                          onClick={handleDescribeWithAI}
+                          disabled={aiLoading || !formData.image}
+                          className="flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 0L8.5 4.5L13 7L8.5 9.5L7 14L5.5 9.5L1 7L5.5 4.5L7 0Z" fill="currentColor"/>
+                          </svg>
+                          {aiLoading ? 'Generating...' : 'Write with AI'}
+                        </button>
+                      </div>
                     </div>
+                    {aiError && (
+                      <p className="mt-2 text-xs text-red-600">{aiError}</p>
+                    )}
                   </div>
                 </div>
               )}
