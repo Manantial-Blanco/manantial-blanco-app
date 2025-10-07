@@ -1,8 +1,7 @@
 'use client';
 
 import { User, ChevronDown } from 'lucide-react';
-import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
-import { useDisconnect } from 'wagmi';
+import { useAppKit, useAppKitAccount, useDisconnect } from '@reown/appkit/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
