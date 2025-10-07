@@ -128,9 +128,16 @@ function transformToDashboardData(assets: any[], walletAddress: Address): Dashbo
     const hasLicense = asset.licenses && asset.licenses.length > 0;
     const status: 'pending' | 'completed' = hasLicense ? 'completed' : 'pending';
 
-    // Get license info for perks/pricing
+    // Get license info for pricing
     const defaultMintingFee = asset.licenses?.[0]?.terms?.defaultMintingFee || '0';
-    const feeInEth = parseInt(defaultMintingFee) / 1e18;
+    const commercialRevShare = asset.licenses?.[0]?.terms?.commercialRevShare || 0;
+
+    // Convert from wei to IP tokens (1 IP = 10^18 wei)
+    const feeInIPTokens = BigInt(defaultMintingFee) / BigInt(1e18);
+    const priceInIPTokens = Number(feeInIPTokens);
+
+    // Calculate revenue share (commercialRevShare is in basis points: 11000000 = 11%)
+    const revSharePercent = commercialRevShare / 1000000;
 
     // Extract image URL from various possible locations
     // Priority: cached/optimized URLs first, then original IPFS URLs
@@ -148,19 +155,41 @@ function transformToDashboardData(assets: any[], walletAddress: Address): Dashbo
       name,
       artist: creatorName,
       type: 'IP Asset' as const,
-      price: `$${(feeInEth * 3000).toFixed(2)} USD`, // Rough ETH to USD conversion
-      perks: `$${(feeInEth * 3000 * 0.1).toFixed(2)} USD`, // 10% perks estimate
+      price: priceInIPTokens > 0 ? `${priceInIPTokens.toFixed(2)} IP` : 'Free',
+      perks: revSharePercent > 0 ? `${revSharePercent.toFixed(2)}%` : 'No royalties',
       status: (hasLicense ? 'completed' : 'pending') as 'pending' | 'completed',
       imageUrl: imageUrl || undefined,
     };
   });
 
+  // Calculate potential earnings from licenses
+  let totalPotentialEarnings = 0;
+  let totalRoyaltyPercent = 0;
+  let assetsWithRoyalties = 0;
+
+  assets.forEach(asset => {
+    const defaultMintingFee = asset.licenses?.[0]?.terms?.defaultMintingFee || '0';
+    const commercialRevShare = asset.licenses?.[0]?.terms?.commercialRevShare || 0;
+
+    const feeInIPTokens = Number(BigInt(defaultMintingFee) / BigInt(1e18));
+    totalPotentialEarnings += feeInIPTokens;
+
+    if (commercialRevShare > 0) {
+      totalRoyaltyPercent += (commercialRevShare / 1000000);
+      assetsWithRoyalties++;
+    }
+  });
+
+  const avgRoyaltyPercent = assetsWithRoyalties > 0
+    ? (totalRoyaltyPercent / assetsWithRoyalties).toFixed(2)
+    : '0';
+
   // Mock movements (Story Protocol doesn't provide transaction history in basic query)
   const movements = [
     {
       from: 'Story Protocol',
-      time: 'Recently',
-      amount: '$0.00 USD',
+      time: 'No transactions yet',
+      amount: '0 IP',
       status: 'completed' as const,
     },
   ];
@@ -169,8 +198,10 @@ function transformToDashboardData(assets: any[], walletAddress: Address): Dashbo
     summary: {
       published: publishedCount,
       registered: totalAssets,
-      earnedPerks: '0', // TODO: Calculate from actual royalty data
-      totalIncome: '$0.00', // TODO: Calculate from actual transaction data
+      earnedPerks: `${avgRoyaltyPercent}% avg royalty`,
+      totalIncome: totalPotentialEarnings > 0
+        ? `${totalPotentialEarnings.toFixed(2)} IP potential`
+        : 'No earnings yet',
     },
     movements,
     pieces,
