@@ -342,8 +342,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                 
                 <button
                   onClick={currentStep === totalSteps ? () => {
-                    // Handle final submission
-                    console.log('Submitting:', formData);
+                    // Handle final submission - could save to Supabase
                   } : handleNext}
                   disabled={!isCurrentStepValid()}
                   className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"

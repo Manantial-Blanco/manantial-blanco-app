@@ -63,7 +63,6 @@ export async function prepareAsset(
   // 3. Upload metadata to IPFS/Arweave
   // 4. Return metadata URL
 
-  console.log('prepareAsset called with:', params);
   return {
     metadataUrl: `placeholder://metadata/${Date.now()}`,
   };
@@ -90,7 +89,6 @@ export async function mintPiece(
   // 3. Wait for transaction confirmation
   // 4. Return token ID and contract address
 
-  console.log('mintPiece called with:', params);
   return {
     tokenId: `placeholder_token_${Date.now()}`,
     contract: 'placeholder_contract_address',
@@ -117,7 +115,6 @@ export async function getPieceToken(tokenId: string): Promise<PieceToken | null>
   // 2. Query token data from blockchain
   // 3. Return token information
 
-  console.log('getPieceToken called with:', tokenId);
   return {
     tokenId,
     contract: 'placeholder_contract_address',

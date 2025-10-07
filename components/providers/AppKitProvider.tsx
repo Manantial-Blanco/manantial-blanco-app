@@ -30,6 +30,9 @@ if (projectId) {
     metadata,
     features: {
       analytics: true, // Optional - defaults to your Cloud configuration
+      socials: ['google', 'github', 'apple', 'facebook', 'x', 'discord'], // Enable social logins
+      email: true, // Enable email authentication
+      emailShowWallets: true, // Show wallet options alongside email
     },
   });
 }

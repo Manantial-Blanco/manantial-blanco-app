@@ -8,6 +8,7 @@ import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { useRouter } from 'next/navigation';
 import { Dictionary, Locale } from '@/types';
 import { NavigationHeader } from '@/components/layout/NavigationHeader';
+import { useUserProfile, useUserEmail, useUserName } from '@/lib/services/reown';
 
 interface LandingUIProps {
   dict: Dictionary;
@@ -267,6 +268,13 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
   const { open } = useAppKit();
   const { address, isConnected } = useAppKitAccount();
   const router = useRouter();
+  
+  // Get user profile data using the ready-to-use hooks
+  const userProfile = useUserProfile();
+  const userEmail = useUserEmail();
+  const userName = useUserName();
+
+
 
   const displayPieces = pieces.length > 0 
     ? pieces 
