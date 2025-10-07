@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, DragEvent } from 'react';
+import Image from 'next/image';
 
 interface ImageUploadProps {
   onUpload: (file: File, preview: string) => void;
@@ -64,11 +65,15 @@ export default function ImageUpload({ onUpload, currentImage }: ImageUploadProps
     <div>
       {currentImage ? (
         <div className="relative">
-          <img 
-            src={currentImage} 
-            alt="Uploaded artwork" 
-            className="w-full h-64 object-cover rounded-lg border border-gray-300"
-          />
+          <div className="relative w-full h-64 rounded-lg border border-gray-300 overflow-hidden">
+            <Image 
+              src={currentImage} 
+              alt="Uploaded artwork" 
+              fill
+              className="object-cover"
+              unoptimized
+            />
+          </div>
           <button
             onClick={() => fileInputRef.current?.click()}
             className="absolute bottom-4 right-4 px-4 py-2 bg-white text-blue-600 rounded-lg shadow-md hover:bg-gray-50 font-medium text-sm"

@@ -8,6 +8,7 @@ import { Dictionary, Locale } from '@/types';
 import { useAppKitAccount } from '@reown/appkit/react';
 import { LanguageDropdown } from '@/components/layout/LanguageDropdown';
 import { WalletUserButton } from '@/components/layout/WalletUserButton';
+import { SECONDARY_COLOR } from '@/lib/constants/colors';
 
 interface NavigationHeaderProps {
   dict: Dictionary;
@@ -77,7 +78,7 @@ export function NavigationHeader({
       `}</style>
       {/* Promo Banner */}
       {showPromoBar && (
-        <div className="relative flex items-center justify-center px-4 sm:px-6 lg:px-8 py-2" style={{ backgroundColor: '#F1E7D3' }}>
+        <div className="relative flex items-center justify-center px-4 sm:px-6 lg:px-8 py-2" style={{ backgroundColor: SECONDARY_COLOR }}>
           <p className="promo-banner-text text-accent-foreground">
             {dict.landing.promoBanner}
           </p>

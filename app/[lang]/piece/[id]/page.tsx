@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { getPieceToken } from '@/lib/services/story';
+import { SECONDARY_COLOR } from '@/lib/constants/colors';
 
 export default async function PieceDetailPage({
   params,
@@ -21,7 +21,6 @@ export default async function PieceDetailPage({
 
   // Fetch piece from Supabase if configured
   let piece: any = null;
-  let tokenInfo: any = null;
 
   if (isSupabaseConfigured()) {
     try {
@@ -41,11 +40,6 @@ export default async function PieceDetailPage({
 
       if (!error && data) {
         piece = data;
-
-        // Get token info if piece has been minted
-        if (piece.token_id) {
-          tokenInfo = await getPieceToken(piece.token_id);
-        }
       }
     } catch (error) {
       console.error('Error fetching piece:', error);
@@ -63,7 +57,12 @@ export default async function PieceDetailPage({
           <Link href={`/${lang}/landing`}>
             <h1 className="text-2xl font-bold">Manantial Blanco</h1>
           </Link>
-          <Link href={`/${lang}/landing#catalog`} className="hover:text-[#F1E7D3]">
+          <Link 
+            href={`/${lang}/landing#catalog`} 
+            className="transition-colors"
+            onMouseEnter={(e) => (e.currentTarget.style.color = SECONDARY_COLOR)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#fff')}
+          >
             ← Back to Catalog
           </Link>
         </div>
@@ -102,32 +101,12 @@ export default async function PieceDetailPage({
                   {piece.tags.map((tag: string) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 bg-[#F1E7D3] text-black rounded-full text-sm"
+                      className="px-3 py-1 text-black rounded-full text-sm"
+                      style={{ backgroundColor: SECONDARY_COLOR }}
                     >
                       {tag}
                     </span>
                   ))}
-                </div>
-              </div>
-            )}
-
-            {tokenInfo && (
-              <div className="mb-8 p-4 bg-gray-50 rounded-lg">
-                <h3 className="text-lg font-semibold text-black mb-2">
-                  Token Information
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <p>
-                    <span className="font-medium">Token ID:</span>{' '}
-                    {tokenInfo.tokenId}
-                  </p>
-                  <p>
-                    <span className="font-medium">Contract:</span>{' '}
-                    {tokenInfo.contract}
-                  </p>
-                  <p>
-                    <span className="font-medium">Owner:</span> {tokenInfo.owner}
-                  </p>
                 </div>
               </div>
             )}
