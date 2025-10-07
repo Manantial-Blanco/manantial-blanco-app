@@ -83,7 +83,7 @@ export function NavigationHeader({
           </p>
           <button
             onClick={onClosePromoBar}
-            className="absolute right-4 sm:right-6 lg:right-8 w-6 h-6 flex items-center justify-center"
+            className="absolute right-4 sm:right-6 lg:right-8 w-6 h-6 flex items-center justify-center cursor-pointer"
             aria-label="Close banner"
           >
             <X className="w-4 h-4" />
@@ -98,7 +98,7 @@ export function NavigationHeader({
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors"
+              className="lg:hidden flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
               aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? (
@@ -140,7 +140,7 @@ export function NavigationHeader({
             {/* Icons - Search, User, Globe */}
             <div className="flex items-center gap-2">
               <button
-                className="hidden lg:flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors"
+                className="hidden lg:flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
@@ -204,7 +204,7 @@ export function NavigationHeader({
                 {/* Mobile Menu Footer with Search, User, Language */}
                 <div className="flex items-center justify-between pt-4 mt-4 border-t border-white/10">
                   <button
-                    className="flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors"
+                    className="flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
                     aria-label="Search"
                   >
                     <Search className="w-5 h-5" />

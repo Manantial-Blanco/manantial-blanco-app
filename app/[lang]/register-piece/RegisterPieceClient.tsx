@@ -111,7 +111,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                         value={formData.name}
                         onChange={(e) => updateFormData('name', e.target.value)}
                         maxLength={30}
-                        className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91]"
                       />
                       <div className="text-right mt-2 text-xs sm:text-sm text-gray-500">
                         max. 30 characters
@@ -152,7 +152,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                         value={formData.description}
                         onChange={(e) => updateFormData('description', e.target.value)}
                         rows={6}
-                        className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91] resize-none"
                       />
                       <button className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 flex items-center gap-2 px-2 sm:px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200">
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -183,7 +183,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                         onChange={(e) => updateFormData('licensePrice', e.target.value)}
                         min="0"
                         step="0.01"
-                        className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91]"
                       />
                     </div>
                   </div>
@@ -204,7 +204,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                       <select
                         value={formData.remixPermissions}
                         onChange={(e) => updateFormData('remixPermissions', e.target.value)}
-                        className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black appearance-none focus:outline-none focus:ring-2 focus:ring-[#486B91] bg-white"
                       >
                         <option value="">Select</option>
                         <option value="Yes">Yes</option>
@@ -243,7 +243,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                           value={formData.name}
                           onChange={(e) => updateFormData('name', e.target.value)}
                           maxLength={30}
-                          className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91]"
                         />
                       </div>
 
@@ -264,7 +264,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                           value={formData.description}
                           onChange={(e) => updateFormData('description', e.target.value)}
                           rows={4}
-                          className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                          className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91] resize-none"
                         />
                       </div>
 
@@ -280,7 +280,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                           onChange={(e) => updateFormData('licensePrice', e.target.value)}
                           min="0"
                           step="0.01"
-                          className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91]"
                         />
                       </div>
 
@@ -293,7 +293,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                           <select
                             value={formData.remixPermissions}
                             onChange={(e) => updateFormData('remixPermissions', e.target.value)}
-                            className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                            className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black appearance-none focus:outline-none focus:ring-2 focus:ring-[#486B91] bg-white"
                           >
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
@@ -334,8 +334,8 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                   <span className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">{currentStep} out of {totalSteps}</span>
                   <div className="flex-1 sm:flex-none sm:w-48 md:w-64 lg:w-80 h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-blue-600 transition-all duration-300 rounded-full"
-                      style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                      className="h-full transition-all duration-300 rounded-full"
+                      style={{ width: `${(currentStep / totalSteps) * 100}%`, backgroundColor: '#486B91' }}
                     />
                   </div>
                 </div>
@@ -345,7 +345,10 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                     // Handle final submission - could save to Supabase
                   } : handleNext}
                   disabled={!isCurrentStepValid()}
-                  className="w-full sm:w-auto px-6 py-2.5 sm:py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
+                  className="w-full sm:w-auto px-6 py-2.5 sm:py-2 text-white rounded-full transition-colors font-medium text-sm sm:text-base disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
+                  style={{ backgroundColor: isCurrentStepValid() ? '#486B91' : undefined }}
+                  onMouseEnter={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = '#3a5573'; }}
+                  onMouseLeave={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = '#486B91'; }}
                 >
                   {currentStep === totalSteps ? 'Submit' : 'Next'}
                 </button>
