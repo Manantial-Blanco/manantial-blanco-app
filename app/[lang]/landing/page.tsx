@@ -8,8 +8,10 @@ import { Address } from 'viem';
 const STORY_API_BASE_URL = process.env.NEXT_PUBLIC_STORY_API_URL || 'https://api.storyapis.com/api/v4';
 const STORY_API_KEY = process.env.STORY_API_KEY || '';
 const FEATURED_WALLETS = [
+  '0x6B7572a1712b27D2E76Bd9ef6533022693314d54',
   '0x7e764d0C7be74d548f4836D357a31D17B0A81fB9',
   '0x2842decf9baEb5ec76988d1261325329848522Ae',
+  '0x0e88AC34917a6BF5E36bFdc2C6C658E58078A1e6',
 ];
 
 async function fetchStoryProtocolPieces(): Promise<Array<{
