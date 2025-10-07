@@ -81,6 +81,22 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
     setFormData((prev) => ({ ...prev, image: file, imagePreview: preview }));
   };
 
+  const handleSubmit = () => {
+    // Prepare form data for submission
+    const submissionData = {
+      name: formData.name,
+      description: formData.description,
+      licensePrice: parseFloat(formData.licensePrice),
+      carrierCommunity: formData.carrierCommunity,
+      remixPermissions: formData.remixPermissions,
+      imageFileName: formData.image?.name,
+      imageSize: formData.image?.size,
+      imageType: formData.image?.type,
+    };
+    
+    console.log('Form submission data:', JSON.stringify(submissionData, null, 2));
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col bg-[#E8E8E8]">
       <NavigationHeader lang={lang} dict={dict} showPromoBar={false} onClosePromoBar={() => {}} />
@@ -341,11 +357,9 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                 </div>
                 
                 <button
-                  onClick={currentStep === totalSteps ? () => {
-                    // Handle final submission - could save to Supabase
-                  } : handleNext}
+                  onClick={currentStep === totalSteps ? handleSubmit : handleNext}
                   disabled={!isCurrentStepValid()}
-                  className="w-full sm:w-auto px-6 py-2.5 sm:py-2 text-white rounded-full transition-colors font-medium text-sm sm:text-base disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
+                  className="w-full sm:w-auto px-6 py-2.5 sm:py-2 text-white rounded-full transition-colors font-medium text-sm sm:text-base cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
                   style={{ backgroundColor: isCurrentStepValid() ? '#486B91' : undefined }}
                   onMouseEnter={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = '#3a5573'; }}
                   onMouseLeave={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = '#486B91'; }}
