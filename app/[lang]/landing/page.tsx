@@ -96,6 +96,17 @@ async function fetchStoryProtocolPieces(): Promise<Array<{
   }
 }
 
+// Dynamic import for large LandingUI component (584 lines with inline SVGs)
+// This improves initial page load performance
+const LandingUI = dynamic(() => import('@/components/imported/LandingUI'), {
+  loading: () => (
+    <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="animate-pulse text-white text-xl">Loading...</div>
+    </div>
+  ),
+  ssr: true, // Still render on server for SEO
+});
+
 export default async function LandingPage({
   params,
 }: {

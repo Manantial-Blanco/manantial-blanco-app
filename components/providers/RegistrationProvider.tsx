@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useAppKitAccount } from '@reown/appkit/react';
 import { useUserEmail } from '@/lib/services/reown';
 import { RegistrationModal } from '@/components/auth/RegistrationModal';
@@ -26,7 +26,7 @@ export function RegistrationProvider({ children, dict }: RegistrationProviderPro
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [hasCheckedRegistration, setHasCheckedRegistration] = useState(false);
 
-  const checkRegistrationStatus = async () => {
+  const checkRegistrationStatus = useCallback(async () => {
     if (!isConnected || !address) {
       setShowRegistrationModal(false);
       setHasCheckedRegistration(false);
@@ -51,7 +51,7 @@ export function RegistrationProvider({ children, dict }: RegistrationProviderPro
     }
     
     setHasCheckedRegistration(true);
-  };
+  }, [isConnected, address, hasCheckedRegistration]);
 
   // Monitor connection status and check registration
   useEffect(() => {
@@ -61,7 +61,7 @@ export function RegistrationProvider({ children, dict }: RegistrationProviderPro
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [isConnected, address, hasCheckedRegistration]);
+  }, [isConnected, address, hasCheckedRegistration, checkRegistrationStatus]);
 
   // Reset check status when disconnected
   useEffect(() => {
