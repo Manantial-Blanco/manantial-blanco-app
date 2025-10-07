@@ -5,10 +5,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { Button } from '@/components/ui/button';
-import { Check as CheckIcon, Clock as ClockIcon, MoreHorizontal as MoreHorizontalIcon } from 'lucide-react';
+import { CheckIcon, ClockIcon, MoreHorizontalIcon } from '@/components/icons';
 import { Dictionary, Locale } from '@/types';
 import { NavigationHeader } from '@/components/layout/NavigationHeader';
-import { PRIMARY_COLOR } from '@/lib/constants/colors';
 
 interface SummaryData {
   title: string;
@@ -42,15 +41,6 @@ interface DashboardData {
   };
   movements: Movement[];
   pieces: Piece[];
-}
-
-// Components
-function StatusIcon({ status }: { status: Status }) {
-  return status === 'pending' ? (
-    <ClockIcon className="h-6 w-6 text-orange-500" />
-  ) : (
-    <CheckIcon className="h-6 w-6 text-green-500" />
-  );
 }
 
 interface HomePageClientProps {
@@ -211,7 +201,11 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
                 </div>
                 <div className="flex items-center gap-4">
                   <p className="font-semibold text-black">{movement.amount}</p>
-                  <StatusIcon status={movement.status} />
+                  {movement.status === 'pending' ? (
+                    <ClockIcon className="h-6 w-6 text-orange-500" />
+                  ) : (
+                    <CheckIcon className="h-6 w-6 text-green-500" />
+                  )}
                 </div>
               </div>
             ))}
@@ -268,7 +262,11 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
                   <span className="font-semibold text-black">{piece.perks}</span>
                 </div>
                 <div className="flex justify-end items-center gap-4">
-                  <StatusIcon status={piece.status} />
+                  {piece.status === 'pending' ? (
+                    <ClockIcon className="h-6 w-6 text-orange-500" />
+                  ) : (
+                    <CheckIcon className="h-6 w-6 text-green-500" />
+                  )}
                   <Button variant="ghost" size="icon">
                     <MoreHorizontalIcon className="h-5 w-5" />
                   </Button>

@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Dictionary, Locale } from '@/types';
 import { NavigationHeader } from '@/components/layout/NavigationHeader';
 import ImageUpload from '@/components/ui/ImageUpload';
-import { PRIMARY_COLOR, PRIMARY_COLOR_HOVER } from '@/lib/constants/colors';
 
 interface RegisterPieceClientProps {
   dict: Dictionary;
@@ -17,6 +16,7 @@ interface FormData {
   imagePreview: string | null;
   description: string;
   licensePrice: string;
+  carrierCommunity: string;
   remixPermissions: string;
 }
 
@@ -28,11 +28,11 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
     imagePreview: null,
     description: '',
     licensePrice: '',
+    carrierCommunity: '',
     remixPermissions: '',
   });
 
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   const totalSteps = 6;
 
@@ -81,46 +81,21 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
     setFormData((prev) => ({ ...prev, image: file, imagePreview: preview }));
   };
 
-  const handleDescribeWithAI = async () => {
-    if (!formData.image) {
-      setAiError('Please upload an image first.');
-      return;
-    }
-    setAiLoading(true);
-    setAiError(null);
-    try {
-      const fd = new FormData();
-      fd.append('image', formData.image, formData.image.name);
-      fd.append('lang', String(lang));
-
-      const res = await fetch('/api/ai-describe-image', {
-        method: 'POST',
-        body: fd,
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json?.error || 'Failed to generate description');
-      }
-      updateFormData('description', json.description);
-    } catch (e: any) {
-      setAiError(e?.message || 'Something went wrong');
-    } finally {
-      setAiLoading(false);
-    }
-  };
-
   const handleSubmit = () => {
-    const submissionData = {
+    // Prepare form data for submission
+    const submissionDataForStory = {
       name: formData.name,
       description: formData.description,
       licensePrice: parseFloat(formData.licensePrice),
+      carrierCommunity: formData.carrierCommunity,
       remixPermissions: formData.remixPermissions,
       imageFileName: formData.image?.name,
       imageSize: formData.image?.size,
       imageType: formData.image?.type,
     };
     
-    console.log('Form submission data:', JSON.stringify(submissionData, null, 2));
+    console.log('Submitting:', formData);
+    console.log('Form submission data:', JSON.stringify(submissionDataForStory, null, 2));
   };
 
   return (
@@ -138,7 +113,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
       <div className="flex-1 py-4 sm:py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-lg shadow-sm max-w-5xl mx-auto relative">
-            <div className="transition-all duration-300 ease-in-out pb-24">
+            <div ref={sectionRef} className="transition-all duration-300 ease-in-out pb-24">
               {/* Step 1: Name */}
               {currentStep === 1 && (
                 <div className="wizard-section min-h-[400px] flex items-center justify-center px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16">
@@ -188,7 +163,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                     <p className="text-center text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
                       Provide a short overview of the artwork&apos;s concept, technique, and creative intent.
                     </p>
-                    <div>
+                    <div className="relative">
                       <textarea
                         placeholder="Provide a short overview of the artwork's concept, technique, and creative intent."
                         value={formData.description}
@@ -196,23 +171,13 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                         rows={6}
                         className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91] resize-none"
                       />
-                      <div className="flex justify-end mt-3">
-                        <button
-                          type="button"
-                          onClick={handleDescribeWithAI}
-                          disabled={aiLoading || !formData.image}
-                          className="flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M7 0L8.5 4.5L13 7L8.5 9.5L7 14L5.5 9.5L1 7L5.5 4.5L7 0Z" fill="currentColor"/>
-                          </svg>
-                          {aiLoading ? 'Generating...' : 'Write with AI'}
-                        </button>
-                      </div>
+                      <button className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 flex items-center gap-2 px-2 sm:px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M7 0L8.5 4.5L13 7L8.5 9.5L7 14L5.5 9.5L1 7L5.5 4.5L7 0Z" fill="currentColor"/>
+                        </svg>
+                        Write with AI
+                      </button>
                     </div>
-                    {aiError && (
-                      <p className="mt-2 text-xs text-red-600">{aiError}</p>
-                    )}
                   </div>
                 </div>
               )}
@@ -367,7 +332,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                       <div className="pt-4">
                         <p className="text-center text-sm text-gray-600">
                           By clicking Submit, you acknowledge that you have read, understood, and agree to be bound by the{' '}
-                          <a href="#" className="underline hover:opacity-80" style={{ color: PRIMARY_COLOR }}>
+                          <a href="#" className="underline hover:opacity-80" style={{ color: '#486B91' }}>
                             Terms and Conditions
                           </a>
                           {' '}of Manantial Blanco.
@@ -387,7 +352,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                   <div className="flex-1 sm:flex-none sm:w-48 md:w-64 lg:w-80 h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div 
                       className="h-full transition-all duration-300 rounded-full"
-                      style={{ width: `${(currentStep / totalSteps) * 100}%`, backgroundColor: PRIMARY_COLOR }}
+                      style={{ width: `${(currentStep / totalSteps) * 100}%`, backgroundColor: '#486B91' }}
                     />
                   </div>
                 </div>
@@ -396,9 +361,9 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                   onClick={currentStep === totalSteps ? handleSubmit : handleNext}
                   disabled={!isCurrentStepValid()}
                   className="w-full sm:w-auto px-6 py-2.5 sm:py-2 text-white rounded-full transition-colors font-medium text-sm sm:text-base cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
-                  style={{ backgroundColor: isCurrentStepValid() ? PRIMARY_COLOR : undefined }}
-                  onMouseEnter={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = PRIMARY_COLOR_HOVER; }}
-                  onMouseLeave={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = PRIMARY_COLOR; }}
+                  style={{ backgroundColor: isCurrentStepValid() ? '#486B91' : undefined }}
+                  onMouseEnter={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = '#3a5573'; }}
+                  onMouseLeave={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = '#486B91'; }}
                 >
                   {currentStep === totalSteps ? 'Submit' : 'Next'}
                 </button>
