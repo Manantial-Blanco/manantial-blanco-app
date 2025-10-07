@@ -83,7 +83,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
 
   const handleSubmit = () => {
     // Prepare form data for submission
-    const submissionData = {
+    const submissionDataForStory = {
       name: formData.name,
       description: formData.description,
       licensePrice: parseFloat(formData.licensePrice),
@@ -94,7 +94,8 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
       imageType: formData.image?.type,
     };
     
-    console.log('Form submission data:', JSON.stringify(submissionData, null, 2));
+    console.log('Submitting:', formData);
+    console.log('Form submission data:', JSON.stringify(submissionDataForStory, null, 2));
   };
 
   return (
