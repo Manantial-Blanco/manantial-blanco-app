@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { prepareAsset, mintPiece } from '@/lib/services/story';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { generateProvenanceHash } from '@/lib/crypto';
+import { SECONDARY_COLOR } from '@/lib/constants/colors';
 
 export default function RemixPage({
   params,
@@ -164,7 +165,9 @@ export default function RemixPage({
           </Link>
           <Link
             href={`/${lang}/piece/${id}`}
-            className="hover:text-[#F1E7D3]"
+            className="transition-colors"
+            onMouseEnter={(e) => (e.currentTarget.style.color = SECONDARY_COLOR)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#fff')}
           >
             ← Back to Original
           </Link>

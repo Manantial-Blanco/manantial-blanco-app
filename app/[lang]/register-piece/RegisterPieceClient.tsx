@@ -4,10 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dictionary, Locale } from '@/types';
 import { NavigationHeader } from '@/components/layout/NavigationHeader';
 import ImageUpload from '@/components/ui/ImageUpload';
-
-// Constants
-const PRIMARY_COLOR = '#486B91';
-const PRIMARY_COLOR_HOVER = '#3a5573';
+import { PRIMARY_COLOR, PRIMARY_COLOR_HOVER } from '@/lib/constants/colors';
 
 interface RegisterPieceClientProps {
   dict: Dictionary;

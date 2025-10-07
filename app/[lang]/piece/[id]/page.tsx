@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { getPieceToken } from '@/lib/services/story';
+import { SECONDARY_COLOR } from '@/lib/constants/colors';
 
 export default async function PieceDetailPage({
   params,
@@ -63,7 +64,12 @@ export default async function PieceDetailPage({
           <Link href={`/${lang}/landing`}>
             <h1 className="text-2xl font-bold">Manantial Blanco</h1>
           </Link>
-          <Link href={`/${lang}/landing#catalog`} className="hover:text-[#F1E7D3]">
+          <Link 
+            href={`/${lang}/landing#catalog`} 
+            className="transition-colors"
+            onMouseEnter={(e) => (e.currentTarget.style.color = SECONDARY_COLOR)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#fff')}
+          >
             ← Back to Catalog
           </Link>
         </div>
@@ -102,7 +108,8 @@ export default async function PieceDetailPage({
                   {piece.tags.map((tag: string) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 bg-[#F1E7D3] text-black rounded-full text-sm"
+                      className="px-3 py-1 text-black rounded-full text-sm"
+                      style={{ backgroundColor: SECONDARY_COLOR }}
                     >
                       {tag}
                     </span>

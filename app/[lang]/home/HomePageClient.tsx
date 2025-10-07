@@ -6,9 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CheckIcon, ClockIcon, MoreHorizontalIcon } from '@/components/icons';
 import { Dictionary, Locale } from '@/types';
 import { NavigationHeader } from '@/components/layout/NavigationHeader';
-
-// Constants
-const PRIMARY_COLOR = '#486B91';
+import { PRIMARY_COLOR } from '@/lib/constants/colors';
 
 // Types
 type Status = 'pending' | 'completed';
