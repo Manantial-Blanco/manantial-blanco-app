@@ -1,8 +1,9 @@
 'use client';
 
-import { Search, X, ChevronDown } from 'lucide-react';
+import { Search, X, ChevronDown, Menu } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 import { Dictionary, Locale } from '@/types';
 import { useAppKitAccount } from '@reown/appkit/react';
 import { LanguageDropdown } from '@/components/layout/LanguageDropdown';
@@ -22,6 +23,41 @@ export function NavigationHeader({
   onClosePromoBar 
 }: NavigationHeaderProps) {
   const { isConnected } = useAppKitAccount();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Close mobile menu when window is resized to desktop size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) { // lg breakpoint
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Close mobile menu on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('keydown', handleEscape);
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
   return (
     <>
       <style jsx>{`
@@ -56,9 +92,22 @@ export function NavigationHeader({
       )}
       
       {/* Header Navigation */}
-      <header className="bg-black text-white sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+      <header className="bg-black text-white sticky top-0 z-50 w-full max-w-full overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full">
+          <div className="flex items-center justify-between h-16 w-full max-w-full">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors"
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+
             {/* Logo */}
             <Link href={`/${lang}/landing`} className="flex items-center">
               <Image
@@ -91,16 +140,84 @@ export function NavigationHeader({
             {/* Icons - Search, User, Globe */}
             <div className="flex items-center gap-2">
               <button
-                className="flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors"
+                className="hidden lg:flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors"
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
               </button>
-              <WalletUserButton />
-              <LanguageDropdown currentLang={lang} />
+              <div className="hidden lg:block">
+                <WalletUserButton dict={dict} />
+              </div>
+              <div className="hidden lg:block">
+                <LanguageDropdown currentLang={lang} />
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <>
+            {/* Backdrop overlay */}
+            <div 
+              className="lg:hidden fixed inset-0 bg-black/50 z-40"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            
+            {/* Mobile menu content */}
+            <div className="lg:hidden relative z-50 bg-black border-t border-white/10 transform transition-all duration-200 ease-in-out">
+              <div className="container mx-auto px-4 py-4">
+                <nav className="flex flex-col gap-4">
+                  <Link 
+                    href={isConnected ? `/${lang}/home` : `/${lang}/login`} 
+                    className="nav-link flex items-center gap-1 hover:text-accent transition-colors py-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {dict.landing.registerCTA}
+                    <ChevronDown className="w-4 h-4" />
+                  </Link>
+                  <a 
+                    href="#catalog" 
+                    className="nav-link flex items-center gap-1 hover:text-accent transition-colors py-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {dict.landing.exploreCTA}
+                    <ChevronDown className="w-4 h-4" />
+                  </a>
+                  <Link 
+                    href="#" 
+                    className="nav-link flex items-center gap-1 hover:text-accent transition-colors py-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {dict.common.about}
+                    <ChevronDown className="w-4 h-4" />
+                  </Link>
+                  <Link 
+                    href="#" 
+                    className="nav-link flex items-center gap-1 hover:text-accent transition-colors py-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {dict.common.contact}
+                  </Link>
+                </nav>
+                
+                {/* Mobile Menu Footer with Search, User, Language */}
+                <div className="flex items-center justify-between pt-4 mt-4 border-t border-white/10">
+                  <button
+                    className="flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors"
+                    aria-label="Search"
+                  >
+                    <Search className="w-5 h-5" />
+                  </button>
+                  <div className="flex items-center gap-2">
+                    <WalletUserButton dict={dict} />
+                    <LanguageDropdown currentLang={lang} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </header>
     </>
   );

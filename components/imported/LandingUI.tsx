@@ -61,11 +61,11 @@ const FooterLinkColumn = ({ title, links, dict }: { title: string; links: Array<
 
 const CategoryButton = ({ icon, text }: { icon: string; text: string }) => (
   <button 
-    className="flex items-center justify-center hover:opacity-90 transition-colors" 
+    className="flex items-center justify-center hover:opacity-90 transition-colors flex-shrink-0 lg:w-full lg:max-w-none" 
     style={{ 
       backgroundColor: '#F1E7D3', 
       color: '#000',
-      width: '306px',
+      width: '280px', // Fixed width for mobile scrolling, will be overridden on desktop  
       height: '97px',
       gap: '10px',
       opacity: 1,
@@ -74,10 +74,10 @@ const CategoryButton = ({ icon, text }: { icon: string; text: string }) => (
       padding: '10px'
     }}
   >
-    <Icon icon={icon} className="w-5 h-5" />
-    <span style={{ 
+    <Icon icon={icon} className="w-5 h-5 flex-shrink-0" />
+    <span className="truncate text-center" style={{ 
       fontWeight: 600,
-      fontSize: '24px',
+      fontSize: '20px',
       lineHeight: '20px',
       letterSpacing: '0%'
     }}>{text}</span>
@@ -245,10 +245,10 @@ const TestimonialsCarousel = ({ testimonials }: { testimonials: Array<{ name: st
   );
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden w-full max-w-full">
       <div 
         ref={carouselRef}
-        className="flex gap-6 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden"
+        className="flex gap-6 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden w-full max-w-full"
         style={{ 
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'
@@ -299,12 +299,12 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
   ];
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-background font-sans">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-background font-sans">
       <NavigationHeader lang={lang} dict={dict} showPromoBar={showBanner} onClosePromoBar={() => setShowBanner(false)} />
 
       {/* Hero Section */}
       <section
-        className="relative w-full h-[600px] flex items-center justify-center text-center text-white"
+        className="relative w-full max-w-full overflow-hidden h-[400px] sm:h-[500px] lg:h-[600px] flex items-center justify-center text-center text-white"
         style={{
           backgroundImage: "url('/images/hero-background.png?width=2886')",
           backgroundSize: 'cover',
@@ -312,29 +312,29 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
         }}
       >
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8">
           <h1 
-            className="mb-4"
+            className="mb-4 text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl w-full max-w-full"
             style={{
               fontWeight: 600,
               fontStyle: 'normal',
-              fontSize: '90px',
-              lineHeight: '90px',
+              lineHeight: '1.1',
               letterSpacing: '-2%',
               textAlign: 'center',
               verticalAlign: 'middle',
-              color: '#F1E7D3'
+              color: '#F1E7D3',
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word'
             }}
           >
             {dict.landing.heroTitle}
           </h1>
           <p 
-            className="max-w-2xl mx-auto mb-8"
+            className="max-w-2xl mx-auto mb-6 sm:mb-8 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl"
             style={{
               fontWeight: 400,
               fontStyle: 'Regular',
-              fontSize: '24px',
-              lineHeight: '26px',
+              lineHeight: '1.3',
               letterSpacing: '-2%',
               textAlign: 'center',
               verticalAlign: 'middle'
@@ -342,54 +342,52 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
           >
             {dict.landing.heroDescription}
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+          <div className="flex flex-row items-center justify-center gap-3 sm:gap-4 lg:gap-6 w-full max-w-full px-2">
             {/* Register Your Cultural IP Button (Connect Wallet) */}
             <button
               onClick={() => (isConnected ? router.push(`/${lang}/home`) : open())}
-              className="px-8 py-4 bg-transparent rounded-full border-2 border-white/30 hover:bg-white/10 hover:border-white/50 transition-all duration-300"
+              className="flex-1 sm:flex-none px-2 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4 bg-transparent rounded-full border-2 border-white/30 hover:bg-white/10 hover:border-white/50 transition-all duration-300 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl min-w-0 whitespace-nowrap overflow-hidden text-ellipsis"
               style={{
                 fontFamily: 'Public Sans',
                 fontWeight: 500,
                 fontStyle: 'normal',
-                fontSize: '24px',
                 lineHeight: '20px',
                 letterSpacing: '0%',
                 color: '#F1E7D3'
               }}
-              aria-label={isConnected ? 'Register your cultural IP' : 'Connect wallet to register your cultural IP'}
+              aria-label={isConnected ? dict.auth.walletConnected : dict.auth.connectToRegister}
             >
-              {isConnected ? 'Register Your Cultural IP' : 'Register Your Cultural IP'}
+              {dict.landing.registerCTA}
             </button>
             
             {/* Work with Authentic Cultural IP Button (Explore Licensed Art) */}
             <a
               href="#catalog"
-              className="px-8 py-4 text-black rounded-full transition-all duration-300"
+              className="flex-1 sm:flex-none px-2 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4 text-black rounded-full transition-all duration-300 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl inline-block text-center min-w-0 whitespace-nowrap overflow-hidden text-ellipsis"
               style={{
                 backgroundColor: '#F1E7D3',
                 fontFamily: 'Public Sans',
                 fontWeight: 500,
                 fontStyle: 'normal',
-                fontSize: '24px',
                 lineHeight: '20px',
                 letterSpacing: '0%'
               }}
             >
-              Work with Authentic Cultural IP
+              {dict.landing.exploreCTA}
             </a>
           </div>
         </div>
       </section>
 
       {/* Tagline */}
-      <div className="py-16 text-center container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-2xl sm:text-3xl font-bold">
+      <div className="py-16 text-center container mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-full">
+        <h2 className="text-2xl sm:text-3xl font-bold w-full max-w-full">
           {dict.landing.tagline}
         </h2>
       </div>
 
       {/* Explore Section */}
-      <div id="catalog" className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div id="catalog" className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16 w-full max-w-full overflow-hidden">
         <h2 className="mb-8" style={{
           fontWeight: 600,
           fontSize: '32px',
@@ -400,7 +398,18 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
         </h2>
 
         {/* Categories */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 mb-8" style={{ gap: '40px' }}>
+        {/* Mobile/Tablet: Horizontal scrolling */}
+        <div className="lg:hidden mb-8 w-full overflow-hidden -mx-4 sm:-mx-6">
+          <div className="flex gap-4 overflow-x-auto scroll-smooth [&::-webkit-scrollbar]:hidden pl-4 sm:pl-6 pr-4 sm:pr-6" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <CategoryButton icon="audioVisual" text={dict.landing.categories.audioVisual} />
+            <CategoryButton icon="illustrations" text={dict.landing.categories.illustrations} />
+            <CategoryButton icon="music" text={dict.landing.categories.music} />
+            <CategoryButton icon="sculptures" text={dict.landing.categories.sculptures} />
+          </div>
+        </div>
+        
+        {/* Desktop: Grid layout */}
+        <div className="hidden lg:grid lg:grid-cols-4 mb-8 gap-8 w-full max-w-full">
           <CategoryButton icon="audioVisual" text={dict.landing.categories.audioVisual} />
           <CategoryButton icon="illustrations" text={dict.landing.categories.illustrations} />
           <CategoryButton icon="music" text={dict.landing.categories.music} />
@@ -408,54 +417,56 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
         </div>
 
         {/* Search Bar */}
-        <div className="border-b border-black pb-6 mb-6">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="flex-1 w-full flex items-center gap-2 px-4 py-2 border rounded-md" style={{ backgroundColor: '#E3E3E333' }}>
-              <Search className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+        <div className="pb-6 mb-6 w-full max-w-full">
+          <div className="flex flex-col sm:flex-row items-stretch gap-4 w-full max-w-full">
+            <div className="flex-1 w-full max-w-full flex items-center gap-3 px-4 py-4 rounded-full border min-w-0" style={{ backgroundColor: '#F5F5F5', height: '56px' }}>
+              <Search className="w-5 h-5 text-gray-400 flex-shrink-0" aria-hidden="true" />
               <input
                 type="text"
                 placeholder={dict.landing.searchPlaceholder}
-                className="flex-1 bg-transparent outline-none text-sm"
+                className="flex-1 bg-transparent outline-none text-base min-w-0 text-gray-700"
                 aria-label="Search artworks"
               />
             </div>
             <button 
-              className="px-8 py-3 text-white rounded-full transition-colors w-full sm:w-auto shadow-md" 
+              className="px-8 py-4 text-white rounded-full transition-all duration-200 w-full sm:w-auto font-medium shadow-lg hover:shadow-xl transform hover:scale-105" 
               style={{ 
                 backgroundColor: '#486B91',
                 fontWeight: 500,
                 fontStyle: 'normal',
-                fontSize: '15px',
+                fontSize: '16px',
                 lineHeight: '20px',
-                letterSpacing: '0%'
+                letterSpacing: '0%',
+                height: '56px',
+                minWidth: '120px'
               }} 
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3a5576'} 
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#486B91'}
             >
-              {dict.common.search}
+              Search
             </button>
           </div>
         </div>
 
         {/* Product Grid */}
         <div>
-          <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
-            <h3 className="text-2xl font-bold">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+            <h3 className="text-2xl font-bold text-left w-full sm:w-auto">
               {dict.landing.recommendedTitle}
             </h3>
-            <div className="flex items-center gap-2">
-              <button className="flex items-center gap-2 px-4 py-2 border rounded-md text-sm" aria-label="Sort options">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <button className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 border rounded-md text-xs sm:text-sm" aria-label="Sort options">
                 <span>{dict.common.sortBy}</span>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 border rounded-md text-sm" aria-label="Category filter">
+              <button className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 border rounded-md text-xs sm:text-sm" aria-label="Category filter">
                 <span>{dict.common.category}</span>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
             {displayPieces.map((piece) => (
               <Link key={piece.id} href={`/${lang}/piece/${piece.id}`} className="group">
                 <div className="relative aspect-square w-full overflow-hidden rounded-md bg-secondary">
@@ -466,8 +477,8 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <div className="mt-2">
-                  <h4 className="font-semibold text-sm truncate">{piece.title}</h4>
+                <div className="mt-1 sm:mt-2">
+                  <h4 className="font-semibold text-xs sm:text-sm truncate">{piece.title}</h4>
                   <p className="text-xs text-muted-foreground">por {piece.creatorName}</p>
                 </div>
               </Link>
@@ -507,18 +518,18 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
 
       {/* Why Cultural IP Section */}
       <section className="text-accent-foreground" style={{ backgroundColor: '#F1E7D3' }}>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+        <div className="container mx-auto px-0 md:px-4 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center gap-0 md:gap-8 lg:gap-12">
             <div className="w-full md:w-1/2">
               <Image
                 src="/images/cultural-ip.jpg" // Replace with your image
                 alt="Artist working on a sculpture"
                 width={600}
                 height={400}
-                className="w-full h-auto object-cover rounded-md"
+                className="w-full h-auto object-cover md:rounded-md"
               />
             </div>
-            <div className="w-full md:w-1/2">
+            <div className="w-full md:w-1/2 px-4 md:px-0 py-8 md:py-0">
               <h2 className="mb-4" style={{ 
                 fontWeight: 600,
                 fontSize: '32px',
@@ -544,13 +555,12 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 
-            className="mb-8"
+            className="mb-8 text-2xl md:text-5xl"
             style={{
               fontFamily: 'Plus Jakarta Sans',
               fontWeight: 700,
               fontStyle: 'normal',
-              fontSize: '48px',
-              lineHeight: '52px',
+              lineHeight: '1.2',
               letterSpacing: '-1%',
               textAlign: 'center'
             }}
