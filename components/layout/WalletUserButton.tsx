@@ -77,7 +77,7 @@ export function WalletUserButton({ dict, lang = 'en' }: WalletUserButtonProps) {
     return (
       <button
         onClick={() => open()}
-        className="flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors"
+        className="flex items-center justify-center w-10 h-10 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
         aria-label={dict.auth.connectWallet}
       >
         <User className="w-5 h-5" />
@@ -103,13 +103,13 @@ export function WalletUserButton({ dict, lang = 'en' }: WalletUserButtonProps) {
       </Link>
       <button
         onClick={handleMyWallet}
-        className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+        className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
       >
         {dict.auth.myWallet}
       </button>
       <button
         onClick={handleLogout}
-        className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors border-t border-gray-200"
+        className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors border-t border-gray-200 cursor-pointer"
       >
         {dict.common.logout}
       </button>
@@ -121,7 +121,7 @@ export function WalletUserButton({ dict, lang = 'en' }: WalletUserButtonProps) {
       <button
         ref={buttonRef}
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="flex items-center justify-center gap-2 w-auto h-10 px-3 hover:bg-white/10 rounded-full transition-colors"
+        className="flex items-center justify-center gap-2 w-auto h-10 px-3 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
         aria-label={dict.auth.walletConnected}
         aria-expanded={isDropdownOpen}
       >
