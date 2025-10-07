@@ -34,12 +34,38 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
 
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const totalSteps = 7;
+  const totalSteps = 6;
 
   useEffect(() => {
     // Scroll to top when step changes
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentStep]);
+
+  const isCurrentStepValid = () => {
+    switch (currentStep) {
+      case 1:
+        return formData.name.trim() !== '';
+      case 2:
+        return formData.image !== null;
+      case 3:
+        return formData.description.trim() !== '';
+      case 4:
+        return formData.licensePrice.trim() !== '' && parseFloat(formData.licensePrice) >= 0;
+      case 5:
+        return formData.remixPermissions !== '';
+      case 6:
+        return (
+          formData.name.trim() !== '' &&
+          formData.image !== null &&
+          formData.description.trim() !== '' &&
+          formData.licensePrice.trim() !== '' &&
+          parseFloat(formData.licensePrice) >= 0 &&
+          formData.remixPermissions !== ''
+        );
+      default:
+        return false;
+    }
+  };
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
@@ -152,7 +178,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                     <div className="relative">
                       <input
                         type="number"
-                        placeholder="Enter amount (USD)"
+                        placeholder="Enter amount ($IP)"
                         value={formData.licensePrice}
                         onChange={(e) => updateFormData('licensePrice', e.target.value)}
                         min="0"
@@ -164,42 +190,8 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                 </div>
               )}
 
-              {/* Step 5: Carrier Community */}
+              {/* Step 5: Remix Permissions */}
               {currentStep === 5 && (
-                <div className="wizard-section min-h-[400px] flex items-center justify-center px-12 py-16">
-                  <div className="w-full max-w-2xl">
-                    <h2 className="text-2xl font-semibold text-black text-center mb-2">
-                      Carrier Community
-                    </h2>
-                    <p className="text-center text-gray-600 mb-8">
-                      Select the group or network your artwork belongs to for registration and licensing purposes.
-                    </p>
-                    <div className="relative">
-                      <select
-                        value={formData.carrierCommunity}
-                        onChange={(e) => updateFormData('carrierCommunity', e.target.value)}
-                        className="w-full px-6 py-4 border border-gray-300 rounded-lg text-base text-black appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                      >
-                        <option value="">Select</option>
-                        <option value="Alebrijes">Alebrijes</option>
-                        <option value="Other">Other</option>
-                      </select>
-                      <svg 
-                        className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" 
-                        width="20" 
-                        height="20" 
-                        viewBox="0 0 20 20" 
-                        fill="none"
-                      >
-                        <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 6: Remix Permissions */}
-              {currentStep === 6 && (
                 <div className="wizard-section min-h-[400px] flex items-center justify-center px-12 py-16">
                   <div className="w-full max-w-2xl">
                     <h2 className="text-2xl font-semibold text-black text-center mb-2">
@@ -232,9 +224,9 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                 </div>
               )}
 
-              {/* Step 7: Summary */}
-              {currentStep === 7 && (
-                <div className="wizard-section min-h-[400px] px-12 py-16">
+              {/* Step 6: Summary */}
+              {currentStep === 6 && (
+                <div className="wizard-section max-h-[60vh] overflow-y-auto px-12 py-16">
                   <div className="w-full max-w-2xl mx-auto">
                     <h2 className="text-2xl font-semibold text-black text-center mb-8">
                       Review your submission
@@ -292,33 +284,6 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                         />
                       </div>
 
-                      {/* Carrier Community - Editable */}
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-600 mb-2">
-                          Carrier Community
-                        </label>
-                        <div className="relative">
-                          <select
-                            value={formData.carrierCommunity}
-                            onChange={(e) => updateFormData('carrierCommunity', e.target.value)}
-                            className="w-full px-6 py-4 border border-gray-300 rounded-lg text-base text-black appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                          >
-                            <option value="">Select</option>
-                            <option value="Alebrijes">Alebrijes</option>
-                            <option value="Other">Other</option>
-                          </select>
-                          <svg 
-                            className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" 
-                            width="20" 
-                            height="20" 
-                            viewBox="0 0 20 20" 
-                            fill="none"
-                          >
-                            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </div>
-                      </div>
-
                       {/* Remix Permissions - Editable */}
                       <div>
                         <label className="block text-sm font-semibold text-gray-600 mb-2">
@@ -363,7 +328,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
             </div>
 
             {/* Progress Bar and Next Button - Fixed to wizard container */}
-            <div className="absolute bottom-0 left-0 right-0 bg-white border-t">
+            <div className="absolute bottom-0 left-0 right-0 bg-white border-t rounded-b-lg">
               <div className="py-4 px-12 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <span className="text-sm text-gray-600">{currentStep} out of {totalSteps}</span>
@@ -380,7 +345,8 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                     // Handle final submission
                     console.log('Submitting:', formData);
                   } : handleNext}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors font-medium"
+                  disabled={!isCurrentStepValid()}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
                 >
                   {currentStep === totalSteps ? 'Submit' : 'Next'}
                 </button>
