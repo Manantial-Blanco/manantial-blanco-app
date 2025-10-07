@@ -1,9 +1,13 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Dictionary, Locale } from '@/types';
 import { NavigationHeader } from '@/components/layout/NavigationHeader';
 import ImageUpload from '@/components/ui/ImageUpload';
+
+// Constants
+const PRIMARY_COLOR = '#486B91';
+const PRIMARY_COLOR_HOVER = '#3a5573';
 
 interface RegisterPieceClientProps {
   dict: Dictionary;
@@ -16,7 +20,6 @@ interface FormData {
   imagePreview: string | null;
   description: string;
   licensePrice: string;
-  carrierCommunity: string;
   remixPermissions: string;
 }
 
@@ -28,11 +31,8 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
     imagePreview: null,
     description: '',
     licensePrice: '',
-    carrierCommunity: '',
     remixPermissions: '',
   });
-
-  const sectionRef = useRef<HTMLDivElement>(null);
 
   const totalSteps = 6;
 
@@ -82,20 +82,17 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
   };
 
   const handleSubmit = () => {
-    // Prepare form data for submission
-    const submissionDataForStory = {
+    const submissionData = {
       name: formData.name,
       description: formData.description,
       licensePrice: parseFloat(formData.licensePrice),
-      carrierCommunity: formData.carrierCommunity,
       remixPermissions: formData.remixPermissions,
       imageFileName: formData.image?.name,
       imageSize: formData.image?.size,
       imageType: formData.image?.type,
     };
     
-    console.log('Submitting:', formData);
-    console.log('Form submission data:', JSON.stringify(submissionDataForStory, null, 2));
+    console.log('Form submission data:', JSON.stringify(submissionData, null, 2));
   };
 
   return (
@@ -113,7 +110,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
       <div className="flex-1 py-4 sm:py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-lg shadow-sm max-w-5xl mx-auto relative">
-            <div ref={sectionRef} className="transition-all duration-300 ease-in-out pb-24">
+            <div className="transition-all duration-300 ease-in-out pb-24">
               {/* Step 1: Name */}
               {currentStep === 1 && (
                 <div className="wizard-section min-h-[400px] flex items-center justify-center px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16">
@@ -332,7 +329,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                       <div className="pt-4">
                         <p className="text-center text-sm text-gray-600">
                           By clicking Submit, you acknowledge that you have read, understood, and agree to be bound by the{' '}
-                          <a href="#" className="underline hover:opacity-80" style={{ color: '#486B91' }}>
+                          <a href="#" className="underline hover:opacity-80" style={{ color: PRIMARY_COLOR }}>
                             Terms and Conditions
                           </a>
                           {' '}of Manantial Blanco.
@@ -352,7 +349,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                   <div className="flex-1 sm:flex-none sm:w-48 md:w-64 lg:w-80 h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div 
                       className="h-full transition-all duration-300 rounded-full"
-                      style={{ width: `${(currentStep / totalSteps) * 100}%`, backgroundColor: '#486B91' }}
+                      style={{ width: `${(currentStep / totalSteps) * 100}%`, backgroundColor: PRIMARY_COLOR }}
                     />
                   </div>
                 </div>
@@ -361,9 +358,9 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                   onClick={currentStep === totalSteps ? handleSubmit : handleNext}
                   disabled={!isCurrentStepValid()}
                   className="w-full sm:w-auto px-6 py-2.5 sm:py-2 text-white rounded-full transition-colors font-medium text-sm sm:text-base cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
-                  style={{ backgroundColor: isCurrentStepValid() ? '#486B91' : undefined }}
-                  onMouseEnter={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = '#3a5573'; }}
-                  onMouseLeave={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = '#486B91'; }}
+                  style={{ backgroundColor: isCurrentStepValid() ? PRIMARY_COLOR : undefined }}
+                  onMouseEnter={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = PRIMARY_COLOR_HOVER; }}
+                  onMouseLeave={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = PRIMARY_COLOR; }}
                 >
                   {currentStep === totalSteps ? 'Submit' : 'Next'}
                 </button>

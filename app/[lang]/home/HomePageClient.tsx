@@ -7,14 +7,42 @@ import { CheckIcon, ClockIcon, MoreHorizontalIcon } from '@/components/icons';
 import { Dictionary, Locale } from '@/types';
 import { NavigationHeader } from '@/components/layout/NavigationHeader';
 
-const summaryData = [
-  { title: 'Published', value: '5', unit: 'Pieces' },
-  { title: 'Registered', value: '10', unit: 'Pieces' },
-  { title: 'Earned Perks', value: '130', unit: 'Pesos' },
-  { title: 'Total Income', value: '$2,450', unit: 'pesos' },
+// Constants
+const PRIMARY_COLOR = '#486B91';
+
+// Types
+type Status = 'pending' | 'completed';
+
+interface SummaryItem {
+  title: string;
+  value: string;
+}
+
+interface Movement {
+  from: string;
+  time: string;
+  amount: string;
+  status: Status;
+}
+
+interface Piece {
+  name: string;
+  artist: string;
+  type: string;
+  price: string;
+  perks: string;
+  status: Status;
+}
+
+// Mock Data
+const summaryData: SummaryItem[] = [
+  { title: 'Published', value: '5' },
+  { title: 'Registered', value: '10' },
+  { title: 'Earned Perks', value: '130' },
+  { title: 'Total Income', value: '$2,450' },
 ];
 
-const movementsData = [
+const movementsData: Movement[] = [
   {
     from: 'Juan57923',
     time: '1 minute ago',
@@ -35,7 +63,7 @@ const movementsData = [
   },
 ];
 
-const piecesData = [
+const piecesData: Piece[] = [
   {
     name: 'Alebrije Alado',
     artist: 'Leonardo Linares',
@@ -70,6 +98,15 @@ const piecesData = [
   },
 ];
 
+// Components
+function StatusIcon({ status }: { status: Status }) {
+  return status === 'pending' ? (
+    <ClockIcon className="h-6 w-6 text-orange-500" />
+  ) : (
+    <CheckIcon className="h-6 w-6 text-green-500" />
+  );
+}
+
 interface HomePageClientProps {
   lang: Locale;
   dict: Dictionary;
@@ -87,7 +124,7 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
           <Button 
             onClick={() => router.push(`/${lang}/register-piece`)}
             className="text-white rounded-full px-6 py-3 hover:opacity-90 cursor-pointer"
-            style={{ backgroundColor: '#486B91' }}
+            style={{ backgroundColor: PRIMARY_COLOR }}
           >
             Register Piece
           </Button>
@@ -118,11 +155,7 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
                 </div>
                 <div className="flex items-center gap-4">
                   <p className="font-semibold text-black">{movement.amount}</p>
-                  {movement.status === 'pending' ? (
-                    <ClockIcon className="h-6 w-6 text-orange-500" />
-                  ) : (
-                    <CheckIcon className="h-6 w-6 text-green-500" />
-                  )}
+                  <StatusIcon status={movement.status} />
                 </div>
               </div>
             ))}
@@ -166,11 +199,7 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
                   <span className="font-semibold text-black">{piece.perks}</span>
                 </div>
                 <div className="flex justify-end items-center gap-4">
-                  {piece.status === 'pending' ? (
-                    <ClockIcon className="h-6 w-6 text-orange-500" />
-                  ) : (
-                    <CheckIcon className="h-6 w-6 text-green-500" />
-                  )}
+                  <StatusIcon status={piece.status} />
                   <Button variant="ghost" size="icon">
                     <MoreHorizontalIcon className="h-5 w-5" />
                   </Button>
