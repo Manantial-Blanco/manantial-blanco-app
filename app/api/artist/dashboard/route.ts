@@ -147,11 +147,11 @@ function transformToDashboardData(assets: any[], walletAddress: Address): Dashbo
     return {
       name,
       artist: creatorName,
-      type: 'IP Asset',
+      type: 'IP Asset' as const,
       price: `$${(feeInEth * 3000).toFixed(2)} USD`, // Rough ETH to USD conversion
       perks: `$${(feeInEth * 3000 * 0.1).toFixed(2)} USD`, // 10% perks estimate
-      status,
-      imageUrl,
+      status: (hasLicense ? 'completed' : 'pending') as 'pending' | 'completed',
+      imageUrl: imageUrl || undefined,
     };
   });
 
