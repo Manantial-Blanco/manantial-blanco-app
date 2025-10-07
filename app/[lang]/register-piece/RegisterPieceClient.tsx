@@ -315,7 +315,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                       <div className="pt-4">
                         <p className="text-center text-sm text-gray-600">
                           By clicking Submit, you acknowledge that you have read, understood, and agree to be bound by the{' '}
-                          <a href="#" className="text-blue-600 underline hover:text-blue-700">
+                          <a href="#" className="underline hover:opacity-80" style={{ color: '#486B91' }}>
                             Terms and Conditions
                           </a>
                           {' '}of Manantial Blanco.

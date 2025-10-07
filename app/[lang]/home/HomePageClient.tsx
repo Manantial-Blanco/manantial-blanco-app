@@ -86,7 +86,8 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
           <h2 className="text-3xl font-bold text-black">Artist Panel</h2>
           <Button 
             onClick={() => router.push(`/${lang}/register-piece`)}
-            className="bg-blue-900 text-white hover:bg-blue-800 rounded-full px-6 py-3"
+            className="text-white rounded-full px-6 py-3 hover:opacity-90"
+            style={{ backgroundColor: '#486B91' }}
           >
             Register Piece
           </Button>
