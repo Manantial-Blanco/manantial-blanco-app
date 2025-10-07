@@ -25,6 +25,22 @@ const nextConfig = {
         hostname: 'api.builder.io',
         pathname: '/api/v1/image/assets/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'nft-cdn.alchemy.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ipfs.io',
+      },
+      {
+        protocol: 'https',
+        hostname: 'alchemy.mypinata.cloud',
+      },
     ],
   },
 

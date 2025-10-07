@@ -482,7 +482,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
                     src={piece.imageUrl}
                     alt={piece.title}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 <div className="mt-1 sm:mt-2">
