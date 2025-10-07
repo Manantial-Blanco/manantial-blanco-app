@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Address } from 'viem';
 
 // Story Protocol API Configuration
-const STORY_API_BASE_URL = 'https://api.storyapis.com/api/v4';
-const STORY_API_KEY = 'MhBsxkU1z9fG6TofE59KqiiWV-YlYE8Q4awlLQehF3U';
+const STORY_API_BASE_URL = process.env.NEXT_PUBLIC_STORY_API_URL || 'https://api.storyapis.com/api/v4';
+const STORY_API_KEY = process.env.STORY_API_KEY || '';
 
 // ============================================================================
 // TYPES
