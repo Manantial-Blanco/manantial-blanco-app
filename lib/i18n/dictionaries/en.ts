@@ -87,6 +87,8 @@ export const en: Dictionary = {
     backToLanding: '← Back to Landing Page',
     walletConnected: 'Wallet connected',
     connectToRegister: 'Connect wallet to register your cultural IP',
+    myAccount: 'My account',
+    myWallet: 'My wallet',
   },
   pieces: {
     registerNew: 'Register New Piece',

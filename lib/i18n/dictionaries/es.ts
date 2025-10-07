@@ -87,6 +87,8 @@ export const es: Dictionary = {
     backToLanding: '← Volver a la Página de Inicio',
     walletConnected: 'Billetera conectada',
     connectToRegister: 'Conectar billetera para registrar tu propiedad intelectual cultural',
+    myAccount: 'Mi cuenta',
+    myWallet: 'Mi billetera',
   },
   pieces: {
     registerNew: 'Registrar Nueva Pieza',
