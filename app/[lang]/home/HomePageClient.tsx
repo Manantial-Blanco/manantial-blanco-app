@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useAccount } from 'wagmi';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { CheckIcon, ClockIcon, MoreHorizontalIcon } from '@/components/icons';
 import { Dictionary, Locale } from '@/types';

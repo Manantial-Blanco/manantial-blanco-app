@@ -115,6 +115,8 @@ export interface Dictionary {
     backToLanding: string;
     walletConnected: string;
     connectToRegister: string;
+    myAccount: string;
+    myWallet: string;
   };
   pieces: {
     registerNew: string;

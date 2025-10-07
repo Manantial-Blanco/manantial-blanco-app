@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useDisconnect } from 'wagmi';
+import { useDisconnect } from '@reown/appkit/react';
 import { Locale } from '@/types';
 import { LogOut } from 'lucide-react';
 

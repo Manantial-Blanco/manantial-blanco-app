@@ -306,7 +306,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
       <section
         className="relative w-full max-w-full overflow-hidden h-[400px] sm:h-[500px] lg:h-[600px] flex items-center justify-center text-center text-white"
         style={{
-          backgroundImage: "url('/images/hero-background.png?width=2886')",
+          backgroundImage: "url('/images/hero-mb-wide.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -450,23 +450,23 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
 
         {/* Product Grid */}
         <div>
-          <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
-            <h3 className="text-2xl font-bold">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+            <h3 className="text-2xl font-bold text-left w-full sm:w-auto">
               {dict.landing.recommendedTitle}
             </h3>
-            <div className="flex items-center gap-2">
-              <button className="flex items-center gap-2 px-4 py-2 border rounded-md text-sm" aria-label="Sort options">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <button className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 border rounded-md text-xs sm:text-sm" aria-label="Sort options">
                 <span>{dict.common.sortBy}</span>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 border rounded-md text-sm" aria-label="Category filter">
+              <button className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 border rounded-md text-xs sm:text-sm" aria-label="Category filter">
                 <span>{dict.common.category}</span>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
             {displayPieces.map((piece) => (
               <Link key={piece.id} href={`/${lang}/piece/${piece.id}`} className="group">
                 <div className="relative aspect-square w-full overflow-hidden rounded-md bg-secondary">
@@ -477,8 +477,8 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <div className="mt-2">
-                  <h4 className="font-semibold text-sm truncate">{piece.title}</h4>
+                <div className="mt-1 sm:mt-2">
+                  <h4 className="font-semibold text-xs sm:text-sm truncate">{piece.title}</h4>
                   <p className="text-xs text-muted-foreground">por {piece.creatorName}</p>
                 </div>
               </Link>
@@ -518,18 +518,18 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
 
       {/* Why Cultural IP Section */}
       <section className="text-accent-foreground" style={{ backgroundColor: '#F1E7D3' }}>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+        <div className="container mx-auto px-0 md:px-4 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center gap-0 md:gap-8 lg:gap-12">
             <div className="w-full md:w-1/2">
               <Image
                 src="/images/cultural-ip.jpg" // Replace with your image
                 alt="Artist working on a sculpture"
                 width={600}
                 height={400}
-                className="w-full h-auto object-cover rounded-md"
+                className="w-full h-auto object-cover md:rounded-md"
               />
             </div>
-            <div className="w-full md:w-1/2">
+            <div className="w-full md:w-1/2 px-4 md:px-0 py-8 md:py-0">
               <h2 className="mb-4" style={{ 
                 fontWeight: 600,
                 fontSize: '32px',
@@ -555,13 +555,12 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 
-            className="mb-8"
+            className="mb-8 text-2xl md:text-5xl"
             style={{
               fontFamily: 'Plus Jakarta Sans',
               fontWeight: 700,
               fontStyle: 'normal',
-              fontSize: '48px',
-              lineHeight: '52px',
+              lineHeight: '1.2',
               letterSpacing: '-1%',
               textAlign: 'center'
             }}

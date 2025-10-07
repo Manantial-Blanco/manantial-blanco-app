@@ -146,7 +146,7 @@ export function NavigationHeader({
                 <Search className="w-5 h-5" />
               </button>
               <div className="hidden lg:block">
-                <WalletUserButton dict={dict} />
+                <WalletUserButton dict={dict} lang={lang} />
               </div>
               <div className="hidden lg:block">
                 <LanguageDropdown currentLang={lang} />
@@ -210,7 +210,7 @@ export function NavigationHeader({
                     <Search className="w-5 h-5" />
                   </button>
                   <div className="flex items-center gap-2">
-                    <WalletUserButton dict={dict} />
+                    <WalletUserButton dict={dict} lang={lang} />
                     <LanguageDropdown currentLang={lang} />
                   </div>
                 </div>
