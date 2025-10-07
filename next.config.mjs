@@ -30,7 +30,11 @@ const nextConfig = {
 
   // Experimental features for better performance
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-slot'],
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-slot',
+      '@supabase/supabase-js',
+    ],
   },
   webpack: (config, { isServer }) => {
     // External packages that shouldn't be bundled
@@ -67,9 +71,21 @@ const nextConfig = {
               reuseExistingChunk: true,
               enforce: true,
             },
-            // Separate chunk for large libraries
+            // Separate chunks for large libraries
+            reown: {
+              test: /[\\/]node_modules[\\/]@reown[\\/]/,
+              name: 'reown',
+              chunks: 'all',
+              priority: 40,
+            },
+            wagmi: {
+              test: /[\\/]node_modules[\\/](wagmi|viem)[\\/]/,
+              name: 'wagmi',
+              chunks: 'all',
+              priority: 35,
+            },
             lib: {
-              test: /[\\/]node_modules[\\/](@reown|@supabase|@tanstack|wagmi)[\\/]/,
+              test: /[\\/]node_modules[\\/](@supabase|@tanstack)[\\/]/,
               name: 'lib',
               chunks: 'all',
               priority: 30,
