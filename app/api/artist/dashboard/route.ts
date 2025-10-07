@@ -126,7 +126,7 @@ function transformToDashboardData(assets: any[], walletAddress: Address): Dashbo
 
     // Determine if it has licenses
     const hasLicense = asset.licenses && asset.licenses.length > 0;
-    const status = hasLicense ? 'completed' : 'pending';
+    const status: 'pending' | 'completed' = hasLicense ? 'completed' : 'pending';
 
     // Get license info for perks/pricing
     const defaultMintingFee = asset.licenses?.[0]?.terms?.defaultMintingFee || '0';
