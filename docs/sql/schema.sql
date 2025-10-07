@@ -4,10 +4,9 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  role TEXT NOT NULL CHECK (role IN ('creator', 'creative')),
   wallet_address TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE,
   display_name TEXT,
-  avatar_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

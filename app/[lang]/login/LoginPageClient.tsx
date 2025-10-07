@@ -6,6 +6,7 @@ import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Dictionary, Locale } from '@/types';
 import { NavigationHeader } from '@/components/layout/NavigationHeader';
+import { useUserProfile, useUserEmail } from '@/lib/services/reown';
 
 interface LoginPageClientProps {
   lang: Locale;
@@ -16,26 +17,31 @@ export default function LoginPageClient({ lang, dict }: LoginPageClientProps) {
   const router = useRouter();
   const { open } = useAppKit();
   const { address, isConnected } = useAppKitAccount();
+  
+  // Get user profile data - ready to use anywhere
+  const userProfile = useUserProfile();
+  const userEmail = useUserEmail();
 
   // Handle wallet connection and user creation
   useEffect(() => {
     const handleUserCreation = async () => {
       if (isConnected && address) {
-        // Create or update user profile in Supabase
+        // Check if user exists in Supabase users table
         if (isSupabaseConfigured()) {
-          const { data: existingUser } = await supabase
+          const { data: existingUser, error } = await supabase
             .from('users')
             .select('*')
             .eq('wallet_address', address)
             .single();
 
-          if (!existingUser) {
-            // Create new user with default role 'creative'
-            await supabase.from('users').insert({
+          if (existingUser) {
+            // User already exists
+          } else {
+            // Create new user
+            const { data: newUser, error: insertError } = await supabase.from('users').insert({
               wallet_address: address,
-              role: 'creative',
               display_name: `User ${address.slice(0, 6)}`,
-            });
+            }).select().single();
           }
         }
 
@@ -45,7 +51,7 @@ export default function LoginPageClient({ lang, dict }: LoginPageClientProps) {
     };
 
     handleUserCreation();
-  }, [isConnected, address, lang, router]);
+  }, [isConnected, address, lang, router, userEmail, userProfile]);
 
   const handleConnect = () => {
     open();
