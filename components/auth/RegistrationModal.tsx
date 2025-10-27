@@ -70,7 +70,9 @@ export function RegistrationModal({ dict, isOpen, onClose }: RegistrationModalPr
           .eq('wallet_address', address)
           .single();
 
-        if (existingUser) {
+        // If user exists (no error or error is not "no rows"), update
+        // PGRST116 means no rows returned, which is expected for new users
+        if (existingUser && !checkError) {
           // Update existing user
           const { data: updatedUser, error: updateError } = await supabase
             .from('users')
@@ -84,12 +86,13 @@ export function RegistrationModal({ dict, isOpen, onClose }: RegistrationModalPr
             .single();
 
           if (updateError) {
+            console.error('Update error:', updateError);
             setSubmitError('Failed to update user profile');
             setIsLoading(false);
             return;
           }
         } else {
-          // Create new user
+          // Create new user (either no data or PGRST116 error)
           const { data: newUser, error: insertError } = await supabase
             .from('users')
             .insert({
@@ -101,6 +104,7 @@ export function RegistrationModal({ dict, isOpen, onClose }: RegistrationModalPr
             .single();
 
           if (insertError) {
+            console.error('Insert error:', insertError);
             setSubmitError('Failed to create user profile');
             setIsLoading(false);
             return;

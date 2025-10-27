@@ -240,6 +240,9 @@ export function prepareMetadata(pieceData: {
   imageHash: string;
   creatorName: string;
   creatorAddress: string;
+  creatorEmail?: string;
+  licensePrice?: number;
+  canRemix?: boolean;
   tags?: string[];
   mediaType?: string;
 }): { ipMetadata: IPMetadata; nftMetadata: NFTMetadata } {
@@ -253,6 +256,70 @@ export function prepareMetadata(pieceData: {
     ? pieceData.tags
     : ['digital-art', 'ip-asset', 'story-protocol'];
 
+  // Build social media array (include email if provided)
+  const socialMedia: Array<{ platform: string; url: string }> = [
+    {
+      platform: 'Story Protocol',
+      url: `https://portal.story.foundation/user/${pieceData.creatorAddress}`,
+    },
+    {
+      platform: 'Website',
+      url: 'https://manantialblanco.com',
+    },
+  ];
+
+  if (pieceData.creatorEmail) {
+    socialMedia.push({
+      platform: 'Email',
+      url: `mailto:${pieceData.creatorEmail}`,
+    });
+  }
+
+  // Build attributes array (include creator info if available)
+  const attributes: Array<{ trait_type: string; value: string | number }> = [
+    ...defaultTags.map(tag => ({
+      trait_type: 'tag',
+      value: tag,
+    })),
+    {
+      trait_type: 'platform',
+      value: 'Manantial Blanco',
+    },
+    {
+      trait_type: 'type',
+      value: 'Original Artwork',
+    },
+    {
+      trait_type: 'registered_on',
+      value: 'Story Protocol',
+    },
+    {
+      trait_type: 'creator_name',
+      value: pieceData.creatorName,
+    },
+  ];
+
+  if (pieceData.creatorEmail) {
+    attributes.push({
+      trait_type: 'creator_email',
+      value: pieceData.creatorEmail,
+    });
+  }
+
+  if (pieceData.licensePrice !== undefined) {
+    attributes.push({
+      trait_type: 'license_price',
+      value: pieceData.licensePrice,
+    });
+  }
+
+  if (pieceData.canRemix !== undefined) {
+    attributes.push({
+      trait_type: 'can_remix',
+      value: pieceData.canRemix ? 'yes' : 'no',
+    });
+  }
+
   // Create comprehensive IP metadata
   const ipMetadata: IPMetadata = {
     title: pieceData.name,
@@ -263,36 +330,10 @@ export function prepareMetadata(pieceData: {
         name: pieceData.creatorName || 'Manantial Blanco Artist',
         address: pieceData.creatorAddress,
         contributionPercent: 100,
-        socialMedia: [
-          {
-            platform: 'Story Protocol',
-            url: `https://portal.story.foundation/user/${pieceData.creatorAddress}`,
-          },
-          {
-            platform: 'Website',
-            url: 'https://manantialblanco.com',
-          },
-        ],
+        socialMedia,
       },
     ],
-    attributes: [
-      ...defaultTags.map(tag => ({
-        trait_type: 'tag',
-        value: tag,
-      })),
-      {
-        trait_type: 'platform',
-        value: 'Manantial Blanco',
-      },
-      {
-        trait_type: 'type',
-        value: 'Original Artwork',
-      },
-      {
-        trait_type: 'registered_on',
-        value: 'Story Protocol',
-      },
-    ],
+    attributes,
     tags: defaultTags,
     createdAt: new Date().toISOString(),
     originalLanguage: 'es', // Default to Spanish (can be made dynamic later)

@@ -33,23 +33,44 @@ export function RegistrationProvider({ children, dict }: RegistrationProviderPro
       return;
     }
 
+    let userExists = false;
+
     // Check Supabase users table for existing record
     if (isSupabaseConfigured()) {
-      const { data: existingUser, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('wallet_address', address)
-        .single();
+      try {
+        const { data: existingUser, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('wallet_address', address)
+          .single();
+
+        // User exists if we have data and no error (or error is not "no rows")
+        if (existingUser && !error) {
+          userExists = true;
+          console.log('User found in Supabase:', existingUser.display_name);
+        } else if (error && error.code !== 'PGRST116') {
+          // PGRST116 means "no rows returned" which is expected for new users
+          console.error('Error checking user registration:', error);
+        }
+      } catch (err) {
+        console.error('Failed to check Supabase for user:', err);
+      }
     }
 
-    // Check localStorage to see if user has already completed registration
+    // Also check localStorage as a fallback/cache
     const registrationKey = `registration_completed_${address}`;
     const hasCompletedRegistration = localStorage.getItem(registrationKey);
 
-    if (!hasCompletedRegistration && !hasCheckedRegistration) {
+    // Show modal if user doesn't exist in Supabase AND hasn't been checked yet
+    // (Ignore localStorage if user is not in Supabase - they need to re-register)
+    if (!userExists && !hasCheckedRegistration) {
+      console.log('User not found in Supabase, showing registration modal');
       setShowRegistrationModal(true);
+    } else if (userExists && !hasCompletedRegistration) {
+      // User exists in Supabase but not in localStorage - sync it
+      localStorage.setItem(registrationKey, 'true');
     }
-    
+
     setHasCheckedRegistration(true);
   }, [isConnected, address, hasCheckedRegistration]);
 

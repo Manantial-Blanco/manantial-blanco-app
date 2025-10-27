@@ -16,6 +16,7 @@ import {
 } from '@/lib/services/story';
 import { uploadJSONToIPFS, getIPFSUrl, uploadFileToIPFS } from '@/lib/services/ipfs';
 import { generateFileHash } from '@/lib/crypto';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 interface RegisterPieceClientProps {
   dict: Dictionary;
@@ -160,6 +161,32 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
     setRegistrationError(null);
 
     try {
+      // Step 0: Fetch user profile from Supabase
+      console.log('Fetching user profile from Supabase...');
+      let creatorName = address; // fallback to wallet address
+      let creatorEmail = '';
+
+      if (isSupabaseConfigured()) {
+        try {
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('display_name, email')
+            .eq('wallet_address', address)
+            .single();
+
+          if (userData && !userError) {
+            creatorName = userData.display_name || address;
+            creatorEmail = userData.email || '';
+            console.log('Using creator name from Supabase:', creatorName);
+            console.log('Using creator email from Supabase:', creatorEmail);
+          } else {
+            console.warn('User not found in Supabase, using wallet address as name');
+          }
+        } catch (err) {
+          console.warn('Could not fetch user from Supabase:', err);
+        }
+      }
+
       // Step 1: Upload image to IPFS
       console.log('Uploading image to IPFS...');
       const imageHash = await uploadFileToIPFS(formData.image, formData.name);
@@ -177,8 +204,11 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
         description: formData.description,
         imageUrl,
         imageHash: imageHashForMetadata,
-        creatorName: address,
+        creatorName,
         creatorAddress: address,
+        creatorEmail,
+        licensePrice: parseFloat(formData.licensePrice) || 0,
+        canRemix: formData.remixPermissions === 'yes',
         tags: [], // You can add tags support later
         mediaType: formData.image.type || 'image/jpeg',
       });
@@ -229,19 +259,6 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
         ipId: result.ipId,
         tokenId: result.tokenId.toString(),
       });
-
-      // TODO: Save to Supabase database with network field
-      // Example:
-      // await supabase.from('pieces').insert({
-      //   title: formData.name,
-      //   description: formData.description,
-      //   image_url: imageUrl,
-      //   ip_id: result.ipId,
-      //   token_id: result.tokenId.toString(),
-      //   transaction_hash: result.txHash,
-      //   network: getCurrentNetwork(), // 'mainnet' or 'aeneid'
-      //   ...other fields
-      // });
 
       // Show success modal
       setShowSuccessModal(true);
