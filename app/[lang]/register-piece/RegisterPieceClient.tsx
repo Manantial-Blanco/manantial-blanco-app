@@ -6,6 +6,16 @@ import { NavigationHeader } from '@/components/layout/NavigationHeader';
 import ImageUpload from '@/components/ui/ImageUpload';
 import SuccessModal from '@/components/ui/SuccessModal';
 import { PRIMARY_COLOR, PRIMARY_COLOR_HOVER } from '@/lib/constants/colors';
+import { useAccount, useWalletClient } from 'wagmi';
+import {
+  createStoryClient,
+  registerIPAsset,
+  getSPGNFTContract,
+  prepareMetadata,
+  createMetadataHash,
+} from '@/lib/services/story';
+import { uploadJSONToIPFS, getIPFSUrl, uploadFileToIPFS } from '@/lib/services/ipfs';
+import { generateFileHash } from '@/lib/crypto';
 
 interface RegisterPieceClientProps {
   dict: Dictionary;
@@ -35,6 +45,17 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [registrationError, setRegistrationError] = useState<string | null>(null);
+  const [registrationResult, setRegistrationResult] = useState<{
+    txHash: string;
+    ipId: string;
+    tokenId: string;
+  } | null>(null);
+
+  // Wallet connection
+  const { address, isConnected, chain } = useAccount();
+  const { data: walletClient } = useWalletClient();
 
   const totalSteps = 6;
 
@@ -111,32 +132,144 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
     }
   };
 
-  const handleSubmit = () => {
-    const submissionData = {
-      name: formData.name,
-      description: formData.description,
-      licensePrice: parseFloat(formData.licensePrice),
-      remixPermissions: formData.remixPermissions,
-      imageFileName: formData.image?.name,
-      imageSize: formData.image?.size,
-      imageType: formData.image?.type,
-    };
-    
-    console.log('Form submission data:', JSON.stringify(submissionData, null, 2));
-    
-    // Show success modal
-    setShowSuccessModal(true);
+  const handleSubmit = async () => {
+    if (!formData.image) {
+      setRegistrationError('Please upload an image');
+      return;
+    }
+
+    if (!isConnected || !address) {
+      setRegistrationError('Please connect your wallet first');
+      return;
+    }
+
+    if (!walletClient) {
+      setRegistrationError('Wallet client not available');
+      return;
+    }
+
+    // Verify we're on a Story Protocol network (1514 = Mainnet, 1315 = Aeneid Testnet)
+    if (chain?.id !== 1514 && chain?.id !== 1315) {
+      setRegistrationError(
+        `Wrong network! Please switch to Story Mainnet or Story Aeneid Testnet in your wallet. Current network: ${chain?.name || 'Unknown'} (${chain?.id || 'N/A'})`
+      );
+      return;
+    }
+
+    setIsRegistering(true);
+    setRegistrationError(null);
+
+    try {
+      // Step 1: Upload image to IPFS
+      console.log('Uploading image to IPFS...');
+      const imageHash = await uploadFileToIPFS(formData.image, formData.name);
+      const imageUrl = getIPFSUrl(imageHash);
+      console.log('Image uploaded:', imageUrl);
+
+      // Step 2: Prepare metadata
+      console.log('Preparing metadata...');
+
+      // Create hash of the image file for mediaHash field
+      const imageHashForMetadata = await generateFileHash(formData.image);
+
+      const { ipMetadata, nftMetadata } = prepareMetadata({
+        name: formData.name,
+        description: formData.description,
+        imageUrl,
+        imageHash: imageHashForMetadata,
+        creatorName: address,
+        creatorAddress: address,
+        tags: [], // You can add tags support later
+        mediaType: formData.image.type || 'image/jpeg',
+      });
+
+      // Step 3: Upload metadata to IPFS
+      console.log('Uploading IP metadata to IPFS...');
+      const ipMetadataHash = await uploadJSONToIPFS(ipMetadata, `${formData.name}-ip-metadata`);
+      const ipMetadataURI = getIPFSUrl(ipMetadataHash);
+
+      console.log('Uploading NFT metadata to IPFS...');
+      const nftMetadataHash = await uploadJSONToIPFS(nftMetadata, `${formData.name}-nft-metadata`);
+      const nftMetadataURI = getIPFSUrl(nftMetadataHash);
+
+      // Step 4: Create metadata hashes
+      console.log('Creating metadata hashes...');
+      const ipHash = await createMetadataHash(ipMetadata);
+      const nftHash = await createMetadataHash(nftMetadata);
+
+      // Step 5: Initialize Story Protocol client
+      console.log('Initializing Story Protocol client...');
+      const storyClient = createStoryClient(walletClient);
+
+      if (!storyClient) {
+        throw new Error('Failed to initialize Story Protocol client');
+      }
+
+      // Step 6: Get SPG NFT contract (auto-detects mainnet/testnet)
+      const spgNftContract = getSPGNFTContract(chain?.id);
+
+      // Step 7: Register IP Asset
+      console.log('Registering IP Asset on Story Protocol...');
+      const result = await registerIPAsset(storyClient, {
+        nftContract: spgNftContract,
+        recipient: address,
+        ipMetadata: {
+          ipMetadataURI,
+          ipMetadataHash: ipHash,
+          nftMetadataURI,
+          nftMetadataHash: nftHash,
+        },
+      });
+
+      console.log('IP Asset registered successfully:', result);
+
+      // Save result
+      setRegistrationResult({
+        txHash: result.txHash,
+        ipId: result.ipId,
+        tokenId: result.tokenId.toString(),
+      });
+
+      // TODO: Save to Supabase database with network field
+      // Example:
+      // await supabase.from('pieces').insert({
+      //   title: formData.name,
+      //   description: formData.description,
+      //   image_url: imageUrl,
+      //   ip_id: result.ipId,
+      //   token_id: result.tokenId.toString(),
+      //   transaction_hash: result.txHash,
+      //   network: getCurrentNetwork(), // 'mainnet' or 'aeneid'
+      //   ...other fields
+      // });
+
+      // Show success modal
+      setShowSuccessModal(true);
+    } catch (error: any) {
+      console.error('Registration failed:', error);
+      setRegistrationError(error?.message || 'Failed to register IP asset. Please try again.');
+    } finally {
+      setIsRegistering(false);
+    }
   };
 
   return (
     <>
-      <SuccessModal 
+      <SuccessModal
         isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        title="Success"
-        message="Your artwork has been registered successfully!"
+        onClose={() => {
+          setShowSuccessModal(false);
+          // Redirect to home or piece details
+          window.location.href = `/${lang}/home`;
+        }}
+        title="Success!"
+        message={
+          registrationResult
+            ? `Your artwork has been registered as an IP Asset!\n\nTransaction: ${registrationResult.txHash.slice(0, 10)}...\nIP ID: ${registrationResult.ipId.slice(0, 10)}...\nToken ID: ${registrationResult.tokenId}`
+            : "Your artwork has been registered successfully!"
+        }
       />
-      
+
       <div className="min-h-screen w-full flex flex-col bg-[#E8E8E8]">
         <NavigationHeader lang={lang} dict={dict} showPromoBar={false} onClosePromoBar={() => {}} />
 
@@ -376,6 +509,28 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                         </div>
                       </div>
 
+                      {/* Wallet Connection Warning */}
+                      {!isConnected && (
+                        <div className="pt-4">
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <p className="text-sm text-yellow-800 text-center">
+                              ⚠️ Please connect your wallet to register this artwork as an IP Asset
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Registration Error */}
+                      {registrationError && (
+                        <div className="pt-4">
+                          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <p className="text-sm text-red-800 text-center">
+                              ❌ {registrationError}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Terms and Conditions */}
                       <div className="pt-4">
                         <p className="text-center text-sm text-gray-600">
@@ -398,22 +553,28 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                 <div className="flex items-center gap-3 sm:gap-4 flex-1">
                   <span className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">{currentStep} out of {totalSteps}</span>
                   <div className="flex-1 sm:flex-none sm:w-48 md:w-64 lg:w-80 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className="h-full transition-all duration-300 rounded-full"
                       style={{ width: `${(currentStep / totalSteps) * 100}%`, backgroundColor: PRIMARY_COLOR }}
                     />
                   </div>
                 </div>
-                
+
                 <button
                   onClick={currentStep === totalSteps ? handleSubmit : handleNext}
-                  disabled={!isCurrentStepValid()}
-                  className="w-full sm:w-auto px-6 py-2.5 sm:py-2 text-white rounded-full transition-colors font-medium text-sm sm:text-base cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
-                  style={{ backgroundColor: isCurrentStepValid() ? PRIMARY_COLOR : undefined }}
-                  onMouseEnter={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = PRIMARY_COLOR_HOVER; }}
-                  onMouseLeave={(e) => { if (isCurrentStepValid()) e.currentTarget.style.backgroundColor = PRIMARY_COLOR; }}
+                  disabled={!isCurrentStepValid() || (currentStep === totalSteps && isRegistering)}
+                  className="w-full sm:w-auto px-6 py-2.5 sm:py-2 text-white rounded-full transition-colors font-medium text-sm sm:text-base cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300 flex items-center justify-center gap-2"
+                  style={{ backgroundColor: isCurrentStepValid() && !isRegistering ? PRIMARY_COLOR : undefined }}
+                  onMouseEnter={(e) => { if (isCurrentStepValid() && !isRegistering) e.currentTarget.style.backgroundColor = PRIMARY_COLOR_HOVER; }}
+                  onMouseLeave={(e) => { if (isCurrentStepValid() && !isRegistering) e.currentTarget.style.backgroundColor = PRIMARY_COLOR; }}
                 >
-                  {currentStep === totalSteps ? 'Submit' : 'Next'}
+                  {isRegistering && (
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  )}
+                  {currentStep === totalSteps ? (isRegistering ? 'Registering...' : 'Submit') : 'Next'}
                 </button>
               </div>
             </div>

@@ -3,12 +3,11 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useAccount } from 'wagmi';
+import { useAccount, useBalance } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { Check as CheckIcon, Clock as ClockIcon, MoreHorizontal as MoreHorizontalIcon } from 'lucide-react';
 import { Dictionary, Locale } from '@/types';
 import { NavigationHeader } from '@/components/layout/NavigationHeader';
-import { PRIMARY_COLOR } from '@/lib/constants/colors';
 
 interface SummaryData {
   title: string;
@@ -51,21 +50,26 @@ interface HomePageClientProps {
 
 export default function HomePageClient({ lang, dict }: HomePageClientProps) {
   const router = useRouter();
-  const { address, isConnected, isConnecting } = useAccount();
+  const { address, isConnected, isConnecting, chain } = useAccount();
+  const { data: balance } = useBalance({
+    address: address,
+    chainId: chain?.id,
+  });
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchDashboardData() {
-      if (!address) {
+      if (!address || !chain) {
         setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
-        const response = await fetch(`/api/artist/dashboard?wallet=${address}`);
+        // Pass both wallet address and chainId to the API
+        const response = await fetch(`/api/artist/dashboard?wallet=${address}&chainId=${chain.id}`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch dashboard data');
@@ -87,7 +91,7 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
     }
 
     fetchDashboardData();
-  }, [address]);
+  }, [address, chain]);
 
   const summaryData: SummaryData[] = dashboardData ? [
     { title: 'Published', value: String(dashboardData.summary.published), unit: 'Pieces' },
@@ -162,7 +166,7 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-3xl font-bold text-black">Artist Panel</h2>
-            <Button 
+            <Button
               onClick={() => router.push(`/${lang}/register-piece`)}
               className="text-white rounded-full px-6 py-3 hover:opacity-90 cursor-pointer"
               style={{ backgroundColor: '#486B91' }}
@@ -170,10 +174,20 @@ export default function HomePageClient({ lang, dict }: HomePageClientProps) {
               Register Piece
             </Button>
           </div>
-          {address && (
-            <p className="text-sm text-gray-500">
-              Connected: {address.slice(0, 6)}...{address.slice(-4)}
-            </p>
+          {address && chain && (
+            <div className="text-sm text-gray-500 space-y-1">
+              <p>Connected: {address.slice(0, 6)}...{address.slice(-4)}</p>
+              <p>
+                Network: <span className="font-semibold">{chain.name}</span> (Chain ID: {chain.id})
+              </p>
+              {balance && (
+                <p>
+                  Balance: <span className="font-semibold text-blue-600">
+                    {(Number(balance.value) / 1e18).toFixed(4)} {balance.symbol}
+                  </span>
+                </p>
+              )}
+            </div>
           )}
         </div>
 

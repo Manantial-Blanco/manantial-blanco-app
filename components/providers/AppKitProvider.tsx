@@ -1,9 +1,9 @@
 'use client';
 
-import { wagmiAdapter, projectId, networks } from '@/config/wagmi';
+import { wagmiAdapter, projectId, networks, storyMainnet } from '@/config/wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
-import { mainnet } from '@reown/appkit/networks';
+import { type AppKitNetwork } from '@reown/appkit/networks';
 import React, { type ReactNode } from 'react';
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi';
 
@@ -25,8 +25,8 @@ if (projectId) {
   modal = createAppKit({
     adapters: [wagmiAdapter],
     projectId,
-    networks: [mainnet, ...networks.slice(1)],
-    defaultNetwork: mainnet,
+    networks: networks as [AppKitNetwork, ...AppKitNetwork[]],
+    defaultNetwork: storyMainnet,
     metadata,
     features: {
       analytics: true, // Optional - defaults to your Cloud configuration

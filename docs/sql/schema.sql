@@ -18,10 +18,24 @@ CREATE TABLE IF NOT EXISTS pieces (
   description TEXT NOT NULL,
   image_url TEXT NOT NULL,
   creator_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  token_id TEXT,
-  token_contract TEXT,
-  provenance_hash TEXT NOT NULL,
-  can_remix BOOLEAN DEFAULT false,
+
+  -- Story Protocol IP Asset fields
+  ip_id TEXT UNIQUE,                    -- Story Protocol IP Asset ID
+  token_id TEXT,                         -- NFT Token ID
+  token_contract TEXT,                   -- NFT Contract Address (SPG)
+  transaction_hash TEXT,                 -- Blockchain transaction hash
+
+  -- IPFS Metadata URIs
+  ip_metadata_uri TEXT,                  -- IPFS URI for IP metadata
+  ip_metadata_hash TEXT,                 -- SHA-256 hash of IP metadata
+  nft_metadata_uri TEXT,                 -- IPFS URI for NFT metadata
+  nft_metadata_hash TEXT,                -- SHA-256 hash of NFT metadata
+
+  -- Legacy fields
+  provenance_hash TEXT NOT NULL,         -- Original provenance hash (kept for compatibility)
+  can_remix BOOLEAN DEFAULT false,       -- Whether remixing is allowed
+  license_price DECIMAL(10, 2),          -- License price in $IP tokens
+
   tags TEXT[] DEFAULT '{}',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -40,6 +54,8 @@ CREATE TABLE IF NOT EXISTS remixes (
 CREATE INDEX IF NOT EXISTS idx_pieces_creator ON pieces(creator_user_id);
 CREATE INDEX IF NOT EXISTS idx_pieces_tags ON pieces USING GIN(tags);
 CREATE INDEX IF NOT EXISTS idx_pieces_created_at ON pieces(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_pieces_ip_id ON pieces(ip_id) WHERE ip_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_pieces_token_id ON pieces(token_id) WHERE token_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_remixes_original ON remixes(original_piece_id);
 CREATE INDEX IF NOT EXISTS idx_remixes_remix ON remixes(remix_piece_id);
 
