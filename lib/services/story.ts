@@ -367,6 +367,134 @@ export function prepareMetadata(pieceData: {
 }
 
 /**
+ * PIL (Programmable IP License) Types
+ */
+export type PILLicenseType =
+  | 'non-commercial' // Non-Commercial Social Remixing (Free, remixes allowed, no commercial use)
+  | 'commercial-use' // Commercial Use (Paid, no remixes, commercial use allowed)
+  | 'commercial-remix'; // Commercial Remix (Paid, remixes allowed, revenue sharing)
+
+export interface PILLicenseConfig {
+  type: PILLicenseType;
+  // For commercial licenses
+  mintingFee?: string; // In IP tokens (e.g., "1" for 1 IP token)
+  // For commercial remix
+  commercialRevShare?: number; // Percentage (0-100)
+  currency?: Address; // Token address for payments
+}
+
+/**
+ * Attach License Terms Result
+ */
+export interface AttachLicenseTermsResult {
+  txHash: string;
+  licenseTermsId: string;
+}
+
+/**
+ * Get the default License Terms ID for non-commercial social remixing
+ * This is a pre-registered license on the protocol
+ */
+export function getDefaultLicenseTermsId(): string {
+  return '1'; // Non-Commercial Social Remixing
+}
+
+/**
+ * Attach license terms to an IP Asset
+ * @param client - Story Protocol client instance
+ * @param ipId - IP Asset ID to attach license to
+ * @param licenseTermsId - License terms ID (default: 1n for non-commercial)
+ * @returns Transaction hash and license terms ID
+ */
+export async function attachLicenseTerms(
+  client: StoryClient,
+  ipId: Address,
+  licenseTermsId: bigint = 1n
+): Promise<AttachLicenseTermsResult> {
+  try {
+    const response = await client.license.attachLicenseTerms({
+      ipId,
+      licenseTermsId,
+    });
+
+    if (!response.txHash) {
+      throw new Error('Failed to attach license terms: Missing transaction hash');
+    }
+
+    return {
+      txHash: response.txHash,
+      licenseTermsId: licenseTermsId.toString(),
+    };
+  } catch (error) {
+    console.error('Failed to attach license terms:', error);
+    throw error;
+  }
+}
+
+/**
+ * Register PIL terms and attach to IP Asset in one transaction
+ * Use this for custom license configurations
+ * @param client - Story Protocol client instance
+ * @param ipId - IP Asset ID
+ * @param config - PIL license configuration
+ * @returns Transaction hash and license terms ID
+ */
+export async function registerAndAttachPILTerms(
+  client: StoryClient,
+  ipId: Address,
+  config: PILLicenseConfig
+): Promise<AttachLicenseTermsResult> {
+  try {
+    // Dynamic import to avoid bundling issues
+    const { PILFlavor } = await import('@story-protocol/core-sdk');
+    const { parseEther } = await import('viem');
+
+    let terms;
+
+    switch (config.type) {
+      case 'non-commercial':
+        // For non-commercial, just use the default license terms ID
+        return attachLicenseTerms(client, ipId, 1n);
+
+      case 'commercial-use':
+        terms = PILFlavor.commercialUse({
+          defaultMintingFee: parseEther(config.mintingFee || '1'),
+          currency: config.currency || ('0x1514000000000000000000000000000000000000' as Address),
+        });
+        break;
+
+      case 'commercial-remix':
+        terms = PILFlavor.commercialRemix({
+          commercialRevShare: config.commercialRevShare || 10,
+          defaultMintingFee: parseEther(config.mintingFee || '1'),
+          currency: config.currency || ('0x1514000000000000000000000000000000000000' as Address),
+        });
+        break;
+
+      default:
+        throw new Error(`Unknown license type: ${config.type}`);
+    }
+
+    const response = await client.license.registerPilTermsAndAttach({
+      ipId,
+      licenseTermsData: [{ terms }],
+    });
+
+    if (!response.txHash || !response.licenseTermsIds || response.licenseTermsIds.length === 0) {
+      throw new Error('Failed to register and attach PIL terms: Missing response data');
+    }
+
+    return {
+      txHash: response.txHash,
+      licenseTermsId: response.licenseTermsIds[0].toString(),
+    };
+  } catch (error) {
+    console.error('Failed to register and attach PIL terms:', error);
+    throw error;
+  }
+}
+
+/**
  * Legacy interfaces for backward compatibility
  */
 export interface PrepareAssetParams {

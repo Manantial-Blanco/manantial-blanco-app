@@ -13,6 +13,8 @@ import {
   getSPGNFTContract,
   prepareMetadata,
   createMetadataHash,
+  registerAndAttachPILTerms,
+  PILLicenseType,
 } from '@/lib/services/story';
 import { uploadJSONToIPFS, getIPFSUrl, uploadFileToIPFS } from '@/lib/services/ipfs';
 import { generateFileHash } from '@/lib/crypto';
@@ -28,7 +30,9 @@ interface FormData {
   image: File | null;
   imagePreview: string | null;
   description: string;
+  licenseType: PILLicenseType | '';
   licensePrice: string;
+  commercialRevShare: string;
   remixPermissions: string;
 }
 
@@ -39,7 +43,9 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
     image: null,
     imagePreview: null,
     description: '',
+    licenseType: '',
     licensePrice: '',
+    commercialRevShare: '',
     remixPermissions: '',
   });
 
@@ -58,7 +64,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
   const { address, isConnected, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
 
-  const totalSteps = 6;
+  const totalSteps = 7; // Added license type step
 
   useEffect(() => {
     // Scroll to top when step changes
@@ -74,18 +80,36 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
       case 3:
         return formData.description.trim() !== '';
       case 4:
-        return formData.licensePrice.trim() !== '' && parseFloat(formData.licensePrice) >= 0;
+        return formData.licenseType !== '';
       case 5:
-        return formData.remixPermissions !== '';
+        // License price validation (required for both commercial types)
+        return formData.licensePrice.trim() !== '' && parseFloat(formData.licensePrice) >= 0;
       case 6:
-        return (
-          formData.name.trim() !== '' &&
+        // Commercial rev share validation (only for commercial-remix)
+        if (formData.licenseType === 'commercial-remix') {
+          return formData.commercialRevShare.trim() !== '' &&
+                 parseFloat(formData.commercialRevShare) >= 0 &&
+                 parseFloat(formData.commercialRevShare) <= 100;
+        }
+        return true; // Skip this step for commercial-use
+      case 7:
+        // Final validation
+        const basicValid = formData.name.trim() !== '' &&
           formData.image !== null &&
           formData.description.trim() !== '' &&
+          formData.licenseType !== '' &&
           formData.licensePrice.trim() !== '' &&
-          parseFloat(formData.licensePrice) >= 0 &&
-          formData.remixPermissions !== ''
-        );
+          parseFloat(formData.licensePrice) >= 0;
+
+        // Additional validation for commercial-remix
+        if (formData.licenseType === 'commercial-remix') {
+          return basicValid &&
+                 formData.commercialRevShare.trim() !== '' &&
+                 parseFloat(formData.commercialRevShare) >= 0 &&
+                 parseFloat(formData.commercialRevShare) <= 100;
+        }
+
+        return basicValid;
       default:
         return false;
     }
@@ -93,7 +117,12 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+      // Skip step 6 (commercial rev share) if license type is commercial-use
+      if (currentStep === 5 && formData.licenseType === 'commercial-use') {
+        setCurrentStep(7); // Skip to summary
+      } else {
+        setCurrentStep(currentStep + 1);
+      }
     }
   };
 
@@ -208,7 +237,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
         creatorAddress: address,
         creatorEmail,
         licensePrice: parseFloat(formData.licensePrice) || 0,
-        canRemix: formData.remixPermissions === 'yes',
+        canRemix: formData.licenseType === 'commercial-remix',
         tags: [], // You can add tags support later
         mediaType: formData.image.type || 'image/jpeg',
       });
@@ -252,6 +281,21 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
       });
 
       console.log('IP Asset registered successfully:', result);
+
+      // Step 8: Attach License Terms
+      console.log('Attaching license terms to IP Asset...');
+      let licenseResult;
+
+      if (formData.licenseType === 'commercial-use' || formData.licenseType === 'commercial-remix') {
+        licenseResult = await registerAndAttachPILTerms(storyClient, result.ipId, {
+          type: formData.licenseType,
+          mintingFee: formData.licensePrice,
+          commercialRevShare: formData.licenseType === 'commercial-remix'
+            ? parseFloat(formData.commercialRevShare)
+            : undefined,
+        });
+        console.log('License attached successfully:', licenseResult);
+      }
 
       // Save result
       setRegistrationResult({
@@ -380,67 +424,147 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                 </div>
               )}
 
-              {/* Step 4: License Price */}
+              {/* Step 4: License Type */}
               {currentStep === 4 && (
                 <div className="wizard-section min-h-[400px] flex items-center justify-center px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16">
                   <div className="w-full max-w-2xl">
                     <h2 className="text-xl sm:text-2xl font-semibold text-black text-center mb-2">
-                      License price
+                      License Type
                     </h2>
                     <p className="text-center text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
-                      Set the amount you wish to charge for licensing this artwork.
+                      Choose how others can use your artwork
+                    </p>
+                    <div className="space-y-4">
+                      {/* Commercial Use Option */}
+                      <button
+                        type="button"
+                        onClick={() => updateFormData('licenseType', 'commercial-use')}
+                        className={`w-full p-6 border-2 rounded-lg text-left transition-all ${
+                          formData.licenseType === 'commercial-use'
+                            ? 'border-[#486B91] bg-blue-50'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            formData.licenseType === 'commercial-use'
+                              ? 'border-[#486B91]'
+                              : 'border-gray-300'
+                          }`}>
+                            {formData.licenseType === 'commercial-use' && (
+                              <div className="w-3 h-3 rounded-full bg-[#486B91]" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-black mb-1">Commercial Use</h3>
+                            <p className="text-sm text-gray-600">
+                              Others can purchase the right to use your work commercially. They can display or publish it, but cannot resell your original work or create remixes.
+                            </p>
+                            <div className="mt-2 text-xs text-gray-500">
+                              ✓ Commercial use allowed • ✗ No derivatives • Requires minting fee
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+
+                      {/* Commercial Remix Option */}
+                      <button
+                        type="button"
+                        onClick={() => updateFormData('licenseType', 'commercial-remix')}
+                        className={`w-full p-6 border-2 rounded-lg text-left transition-all ${
+                          formData.licenseType === 'commercial-remix'
+                            ? 'border-[#486B91] bg-blue-50'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            formData.licenseType === 'commercial-remix'
+                              ? 'border-[#486B91]'
+                              : 'border-gray-300'
+                          }`}>
+                            {formData.licenseType === 'commercial-remix' && (
+                              <div className="w-3 h-3 rounded-full bg-[#486B91]" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-black mb-1">Commercial Remix</h3>
+                            <p className="text-sm text-gray-600">
+                              Others can purchase the right to use and remix your work. You earn a percentage of revenue from any commercial use of remixes.
+                            </p>
+                            <div className="mt-2 text-xs text-gray-500">
+                              ✓ Commercial use allowed • ✓ Derivatives allowed • Revenue sharing
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 5: License Price */}
+              {currentStep === 5 && (
+                <div className="wizard-section min-h-[400px] flex items-center justify-center px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16">
+                  <div className="w-full max-w-2xl">
+                    <h2 className="text-xl sm:text-2xl font-semibold text-black text-center mb-2">
+                      Minting Fee
+                    </h2>
+                    <p className="text-center text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
+                      Set the fee (in IP tokens) others must pay to mint a license for your artwork.
                     </p>
                     <div className="relative">
                       <input
                         type="number"
-                        placeholder="Enter amount ($IP)"
+                        placeholder="Enter amount (IP tokens)"
                         value={formData.licensePrice}
                         onChange={(e) => updateFormData('licensePrice', e.target.value)}
                         min="0"
                         step="0.01"
                         className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91]"
                       />
+                      <div className="text-right mt-2 text-xs sm:text-sm text-gray-500">
+                        Recommended: 1-10 IP tokens
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Step 5: Remix Permissions */}
-              {currentStep === 5 && (
+              {/* Step 6: Commercial Revenue Share (only for commercial-remix) */}
+              {currentStep === 6 && formData.licenseType === 'commercial-remix' && (
                 <div className="wizard-section min-h-[400px] flex items-center justify-center px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16">
                   <div className="w-full max-w-2xl">
                     <h2 className="text-xl sm:text-2xl font-semibold text-black text-center mb-2">
-                      Remix permissions
+                      Commercial Revenue Share
                     </h2>
                     <p className="text-center text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
-                      Allow others to create derivative works based on your piece.
+                      Set the percentage of revenue you'll earn from commercial use of remixes based on your work.
                     </p>
                     <div className="relative">
-                      <select
-                        value={formData.remixPermissions}
-                        onChange={(e) => updateFormData('remixPermissions', e.target.value)}
-                        className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black appearance-none focus:outline-none focus:ring-2 focus:ring-[#486B91] bg-white"
-                      >
-                        <option value="">Select</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </select>
-                      <svg 
-                        className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" 
-                        width="20" 
-                        height="20" 
-                        viewBox="0 0 20 20" 
-                        fill="none"
-                      >
-                        <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                      <input
+                        type="number"
+                        placeholder="Enter percentage (0-100)"
+                        value={formData.commercialRevShare}
+                        onChange={(e) => updateFormData('commercialRevShare', e.target.value)}
+                        min="0"
+                        max="100"
+                        step="1"
+                        className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91]"
+                      />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                        %
+                      </div>
+                      <div className="text-right mt-2 text-xs sm:text-sm text-gray-500">
+                        Recommended: 5-20%
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Step 6: Summary */}
-              {currentStep === 6 && (
+              {/* Step 7: Summary */}
+              {currentStep === 7 && (
                 <div className="wizard-section max-h-[60vh] overflow-y-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16">
                   <div className="w-full max-w-2xl mx-auto">
                     <h2 className="text-xl sm:text-2xl font-semibold text-black text-center mb-6 sm:mb-8">
@@ -483,14 +607,31 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                         />
                       </div>
 
-                      {/* License Price - Editable */}
+                      {/* License Type - Read Only */}
                       <div>
                         <label className="block text-xs sm:text-sm font-semibold text-gray-600 mb-2">
-                          License price
+                          License Type
+                        </label>
+                        <div className="px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg bg-gray-50">
+                          <p className="text-sm sm:text-base text-black">
+                            {formData.licenseType === 'commercial-use' ? 'Commercial Use' : 'Commercial Remix'}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-1">
+                            {formData.licenseType === 'commercial-use'
+                              ? '✓ Commercial use • ✗ No derivatives'
+                              : '✓ Commercial use • ✓ Derivatives allowed • Revenue sharing'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Minting Fee - Editable */}
+                      <div>
+                        <label className="block text-xs sm:text-sm font-semibold text-gray-600 mb-2">
+                          Minting Fee (IP tokens)
                         </label>
                         <input
                           type="number"
-                          placeholder="Enter amount (USD)"
+                          placeholder="Enter amount (IP tokens)"
                           value={formData.licensePrice}
                           onChange={(e) => updateFormData('licensePrice', e.target.value)}
                           min="0"
@@ -499,32 +640,24 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                         />
                       </div>
 
-                      {/* Remix Permissions - Editable */}
-                      <div>
-                        <label className="block text-xs sm:text-sm font-semibold text-gray-600 mb-2">
-                          Remix permissions
-                        </label>
-                        <div className="relative">
-                          <select
-                            value={formData.remixPermissions}
-                            onChange={(e) => updateFormData('remixPermissions', e.target.value)}
-                            className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black appearance-none focus:outline-none focus:ring-2 focus:ring-[#486B91] bg-white"
-                          >
-                            <option value="">Select</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                          </select>
-                          <svg 
-                            className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" 
-                            width="20" 
-                            height="20" 
-                            viewBox="0 0 20 20" 
-                            fill="none"
-                          >
-                            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
+                      {/* Commercial Revenue Share - Editable (only for commercial-remix) */}
+                      {formData.licenseType === 'commercial-remix' && (
+                        <div>
+                          <label className="block text-xs sm:text-sm font-semibold text-gray-600 mb-2">
+                            Commercial Revenue Share (%)
+                          </label>
+                          <input
+                            type="number"
+                            placeholder="Enter percentage (0-100)"
+                            value={formData.commercialRevShare}
+                            onChange={(e) => updateFormData('commercialRevShare', e.target.value)}
+                            min="0"
+                            max="100"
+                            step="1"
+                            className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91]"
+                          />
                         </div>
-                      </div>
+                      )}
 
                       {/* Wallet Connection Warning */}
                       {!isConnected && (
