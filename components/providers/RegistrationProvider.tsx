@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useAppKitAccount } from '@reown/appkit/react';
-import { useUserEmail } from '@/lib/services/reown';
 import { RegistrationModal } from '@/components/auth/RegistrationModal';
 import { Dictionary } from '@/types';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
@@ -22,7 +21,6 @@ interface RegistrationProviderProps {
 
 export function RegistrationProvider({ children, dict }: RegistrationProviderProps) {
   const { address, isConnected } = useAppKitAccount();
-  const userEmail = useUserEmail();
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [hasCheckedRegistration, setHasCheckedRegistration] = useState(false);
 
@@ -61,14 +59,19 @@ export function RegistrationProvider({ children, dict }: RegistrationProviderPro
     const registrationKey = `registration_completed_${address}`;
     const hasCompletedRegistration = localStorage.getItem(registrationKey);
 
-    // Show modal if user doesn't exist in Supabase AND hasn't been checked yet
-    // (Ignore localStorage if user is not in Supabase - they need to re-register)
-    if (!userExists && !hasCheckedRegistration) {
+    // Show modal ONLY if user doesn't exist in Supabase
+    // If user exists in Supabase, never show the modal
+    if (userExists) {
+      // User exists in Supabase - ensure localStorage is in sync and hide modal
+      if (!hasCompletedRegistration) {
+        localStorage.setItem(registrationKey, 'true');
+      }
+      setShowRegistrationModal(false);
+      console.log('User exists in Supabase, hiding registration modal');
+    } else if (!hasCheckedRegistration) {
+      // User doesn't exist in Supabase and we haven't checked yet - show modal
       console.log('User not found in Supabase, showing registration modal');
       setShowRegistrationModal(true);
-    } else if (userExists && !hasCompletedRegistration) {
-      // User exists in Supabase but not in localStorage - sync it
-      localStorage.setItem(registrationKey, 'true');
     }
 
     setHasCheckedRegistration(true);
