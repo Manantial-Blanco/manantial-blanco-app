@@ -539,7 +539,7 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                       Commercial Revenue Share
                     </h2>
                     <p className="text-center text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
-                      Set the percentage of revenue you'll earn from commercial use of remixes based on your work.
+                      Set the percentage of revenue you&apos;ll earn from commercial use of remixes based on your work.
                     </p>
                     <div className="relative">
                       <input
