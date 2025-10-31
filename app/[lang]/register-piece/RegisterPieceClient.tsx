@@ -14,7 +14,9 @@ import {
   prepareMetadata,
   createMetadataHash,
   registerAndAttachPILTerms,
+  registerCustomPILTerms,
   PILLicenseType,
+  CustomPILTerms,
 } from '@/lib/services/story';
 import { uploadJSONToIPFS, getIPFSUrl, uploadFileToIPFS } from '@/lib/services/ipfs';
 import { generateFileHash } from '@/lib/crypto';
@@ -34,6 +36,15 @@ interface FormData {
   licensePrice: string;
   commercialRevShare: string;
   remixPermissions: string;
+
+  // Custom License Fields
+  customTransferable: boolean;
+  customCommercialUse: boolean;
+  customCommercialAttribution: boolean;
+  customDerivativesAllowed: boolean;
+  customDerivativesAttribution: boolean;
+  customDerivativesApproval: boolean;
+  customDerivativesReciprocal: boolean;
 }
 
 export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientProps) {
@@ -47,6 +58,15 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
     licensePrice: '',
     commercialRevShare: '',
     remixPermissions: '',
+
+    // Custom License Defaults
+    customTransferable: true,
+    customCommercialUse: false,
+    customCommercialAttribution: false,
+    customDerivativesAllowed: false,
+    customDerivativesAttribution: false,
+    customDerivativesApproval: false,
+    customDerivativesReciprocal: false,
   });
 
   const [aiLoading, setAiLoading] = useState(false);
@@ -82,7 +102,11 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
       case 4:
         return formData.licenseType !== '';
       case 5:
-        // License price validation (required for both commercial types)
+        // For custom license, just check that config is complete (always valid)
+        if (formData.licenseType === 'custom') {
+          return true; // Custom config is optional, defaults are fine
+        }
+        // License price validation (required for commercial types)
         return formData.licensePrice.trim() !== '' && parseFloat(formData.licensePrice) >= 0;
       case 6:
         // Commercial rev share validation (only for commercial-remix)
@@ -91,25 +115,33 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                  parseFloat(formData.commercialRevShare) >= 0 &&
                  parseFloat(formData.commercialRevShare) <= 100;
         }
-        return true; // Skip this step for commercial-use
+        return true; // Skip this step for other types
       case 7:
         // Final validation
         const basicValid = formData.name.trim() !== '' &&
           formData.image !== null &&
           formData.description.trim() !== '' &&
-          formData.licenseType !== '' &&
-          formData.licensePrice.trim() !== '' &&
-          parseFloat(formData.licensePrice) >= 0;
+          formData.licenseType !== '';
+
+        // For custom, no price/revshare validation needed
+        if (formData.licenseType === 'custom') {
+          return basicValid;
+        }
+
+        // For commercial types, validate price
+        const priceValid = formData.licensePrice.trim() !== '' &&
+                          parseFloat(formData.licensePrice) >= 0;
 
         // Additional validation for commercial-remix
         if (formData.licenseType === 'commercial-remix') {
           return basicValid &&
+                 priceValid &&
                  formData.commercialRevShare.trim() !== '' &&
                  parseFloat(formData.commercialRevShare) >= 0 &&
                  parseFloat(formData.commercialRevShare) <= 100;
         }
 
-        return basicValid;
+        return basicValid && priceValid;
       default:
         return false;
     }
@@ -117,8 +149,16 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
+      // Skip pricing steps for custom license
+      if (currentStep === 4 && formData.licenseType === 'custom') {
+        setCurrentStep(5); // Go to custom config
+      }
+      // Skip step 6 (commercial rev share) and 5 (price) for custom after config
+      else if (currentStep === 5 && formData.licenseType === 'custom') {
+        setCurrentStep(7); // Skip directly to summary
+      }
       // Skip step 6 (commercial rev share) if license type is commercial-use
-      if (currentStep === 5 && formData.licenseType === 'commercial-use') {
+      else if (currentStep === 5 && formData.licenseType === 'commercial-use') {
         setCurrentStep(7); // Skip to summary
       } else {
         setCurrentStep(currentStep + 1);
@@ -126,7 +166,37 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
     }
   };
 
-  const updateFormData = (field: keyof FormData, value: string | File | null) => {
+  const handleBack = () => {
+    if (currentStep > 1) {
+      // Handle back navigation with proper step skipping
+      if (currentStep === 7) {
+        // From summary, go back based on license type
+        if (formData.licenseType === 'custom') {
+          setCurrentStep(5); // Back to custom config
+        } else if (formData.licenseType === 'commercial-use') {
+          setCurrentStep(5); // Back to minting fee (skip rev share)
+        } else if (formData.licenseType === 'commercial-remix') {
+          setCurrentStep(6); // Back to rev share
+        } else {
+          setCurrentStep(currentStep - 1);
+        }
+      }
+      // From rev share (step 6), go back to minting fee
+      else if (currentStep === 6) {
+        setCurrentStep(5);
+      }
+      // From minting fee or custom config (step 5), go back to license type
+      else if (currentStep === 5) {
+        setCurrentStep(4);
+      }
+      // All other cases, just go back one step
+      else {
+        setCurrentStep(currentStep - 1);
+      }
+    }
+  };
+
+  const updateFormData = (field: keyof FormData, value: string | File | null | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -286,7 +356,26 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
       console.log('Attaching license terms to IP Asset...');
       let licenseResult;
 
-      if (formData.licenseType === 'commercial-use' || formData.licenseType === 'commercial-remix') {
+      if (formData.licenseType === 'custom') {
+        // Custom license with full configuration
+        const customTerms: CustomPILTerms = {
+          transferable: formData.customTransferable,
+          commercialUse: formData.customCommercialUse,
+          commercialAttribution: formData.customCommercialAttribution,
+          derivativesAllowed: formData.customDerivativesAllowed,
+          derivativesAttribution: formData.customDerivativesAttribution,
+          derivativesApproval: formData.customDerivativesApproval,
+          derivativesReciprocal: formData.customDerivativesReciprocal,
+          defaultMintingFee: formData.licensePrice || '0',
+          commercialRevShare: formData.customCommercialUse && formData.commercialRevShare
+            ? parseFloat(formData.commercialRevShare)
+            : 0,
+        };
+
+        licenseResult = await registerCustomPILTerms(storyClient, result.ipId, customTerms);
+        console.log('Custom license attached successfully:', licenseResult);
+      } else if (formData.licenseType === 'commercial-use' || formData.licenseType === 'commercial-remix') {
+        // Preset licenses
         licenseResult = await registerAndAttachPILTerms(storyClient, result.ipId, {
           type: formData.licenseType,
           mintingFee: formData.licensePrice,
@@ -498,6 +587,38 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                           </div>
                         </div>
                       </button>
+
+                      {/* Custom License Option */}
+                      <button
+                        type="button"
+                        onClick={() => updateFormData('licenseType', 'custom')}
+                        className={`w-full p-6 border-2 rounded-lg text-left transition-all ${
+                          formData.licenseType === 'custom'
+                            ? 'border-[#486B91] bg-blue-50'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            formData.licenseType === 'custom'
+                              ? 'border-[#486B91]'
+                              : 'border-gray-300'
+                          }`}>
+                            {formData.licenseType === 'custom' && (
+                              <div className="w-3 h-3 rounded-full bg-[#486B91]" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-black mb-1">Custom License</h3>
+                            <p className="text-sm text-gray-600">
+                              Define your own custom terms with full control over commercial use, derivatives, attribution, and more.
+                            </p>
+                            <div className="mt-2 text-xs text-gray-500">
+                              ⚙️ Full customization • Advanced options • Complete control
+                            </div>
+                          </div>
+                        </div>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -525,6 +646,135 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                       />
                       <div className="text-right mt-2 text-xs sm:text-sm text-gray-500">
                         Recommended: 1-10 IP tokens
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 5.5: Custom License Configuration (only for custom) */}
+              {currentStep === 5 && formData.licenseType === 'custom' && (
+                <div className="wizard-section min-h-[400px] overflow-y-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16">
+                  <div className="w-full max-w-2xl mx-auto">
+                    <h2 className="text-xl sm:text-2xl font-semibold text-black text-center mb-2">
+                      Custom License Configuration
+                    </h2>
+                    <p className="text-center text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
+                      Configure all aspects of your custom license
+                    </p>
+
+                    <div className="space-y-6">
+                      {/* Commercial Use Section */}
+                      <div className="border border-gray-300 rounded-lg p-4">
+                        <h3 className="font-semibold text-black mb-3">Commercial Use</h3>
+                        <div className="space-y-3">
+                          <label className="flex items-center gap-3 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={formData.customCommercialUse}
+                              onChange={(e) => updateFormData('customCommercialUse', e.target.checked)}
+                              className="w-5 h-5 rounded border-gray-300"
+                            />
+                            <div>
+                              <span className="text-sm font-medium text-black">Allow Commercial Use</span>
+                              <p className="text-xs text-gray-600">Others can use your work for commercial purposes</p>
+                            </div>
+                          </label>
+
+                          {formData.customCommercialUse && (
+                            <label className="flex items-center gap-3 cursor-pointer ml-8">
+                              <input
+                                type="checkbox"
+                                checked={formData.customCommercialAttribution}
+                                onChange={(e) => updateFormData('customCommercialAttribution', e.target.checked)}
+                                className="w-5 h-5 rounded border-gray-300"
+                              />
+                              <div>
+                                <span className="text-sm font-medium text-black">Require Attribution</span>
+                                <p className="text-xs text-gray-600">Users must credit you</p>
+                              </div>
+                            </label>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Derivatives Section */}
+                      <div className="border border-gray-300 rounded-lg p-4">
+                        <h3 className="font-semibold text-black mb-3">Derivatives & Remixes</h3>
+                        <div className="space-y-3">
+                          <label className="flex items-center gap-3 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={formData.customDerivativesAllowed}
+                              onChange={(e) => updateFormData('customDerivativesAllowed', e.target.checked)}
+                              className="w-5 h-5 rounded border-gray-300"
+                            />
+                            <div>
+                              <span className="text-sm font-medium text-black">Allow Derivatives</span>
+                              <p className="text-xs text-gray-600">Others can create derivative works</p>
+                            </div>
+                          </label>
+
+                          {formData.customDerivativesAllowed && (
+                            <>
+                              <label className="flex items-center gap-3 cursor-pointer ml-8">
+                                <input
+                                  type="checkbox"
+                                  checked={formData.customDerivativesAttribution}
+                                  onChange={(e) => updateFormData('customDerivativesAttribution', e.target.checked)}
+                                  className="w-5 h-5 rounded border-gray-300"
+                                />
+                                <div>
+                                  <span className="text-sm font-medium text-black">Require Attribution</span>
+                                  <p className="text-xs text-gray-600">Derivatives must credit you</p>
+                                </div>
+                              </label>
+
+                              <label className="flex items-center gap-3 cursor-pointer ml-8">
+                                <input
+                                  type="checkbox"
+                                  checked={formData.customDerivativesApproval}
+                                  onChange={(e) => updateFormData('customDerivativesApproval', e.target.checked)}
+                                  className="w-5 h-5 rounded border-gray-300"
+                                />
+                                <div>
+                                  <span className="text-sm font-medium text-black">Require Approval</span>
+                                  <p className="text-xs text-gray-600">You must approve each derivative</p>
+                                </div>
+                              </label>
+
+                              <label className="flex items-center gap-3 cursor-pointer ml-8">
+                                <input
+                                  type="checkbox"
+                                  checked={formData.customDerivativesReciprocal}
+                                  onChange={(e) => updateFormData('customDerivativesReciprocal', e.target.checked)}
+                                  className="w-5 h-5 rounded border-gray-300"
+                                />
+                                <div>
+                                  <span className="text-sm font-medium text-black">Share-Alike (Reciprocal)</span>
+                                  <p className="text-xs text-gray-600">Derivatives must use same license</p>
+                                </div>
+                              </label>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Transfer Section */}
+                      <div className="border border-gray-300 rounded-lg p-4">
+                        <h3 className="font-semibold text-black mb-3">License Transfer</h3>
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.customTransferable}
+                            onChange={(e) => updateFormData('customTransferable', e.target.checked)}
+                            className="w-5 h-5 rounded border-gray-300"
+                          />
+                          <div>
+                            <span className="text-sm font-medium text-black">Transferable</span>
+                            <p className="text-xs text-gray-600">License can be transferred to others</p>
+                          </div>
+                        </label>
                       </div>
                     </div>
                   </div>
@@ -613,32 +863,58 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                           License Type
                         </label>
                         <div className="px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg bg-gray-50">
-                          <p className="text-sm sm:text-base text-black">
-                            {formData.licenseType === 'commercial-use' ? 'Commercial Use' : 'Commercial Remix'}
+                          <p className="text-sm sm:text-base text-black font-semibold">
+                            {formData.licenseType === 'commercial-use' && 'Commercial Use'}
+                            {formData.licenseType === 'commercial-remix' && 'Commercial Remix'}
+                            {formData.licenseType === 'custom' && 'Custom License'}
                           </p>
-                          <p className="text-xs text-gray-600 mt-1">
-                            {formData.licenseType === 'commercial-use'
-                              ? '✓ Commercial use • ✗ No derivatives'
-                              : '✓ Commercial use • ✓ Derivatives allowed • Revenue sharing'}
-                          </p>
+                          {formData.licenseType === 'commercial-use' && (
+                            <p className="text-xs text-gray-600 mt-1">
+                              ✓ Commercial use • ✗ No derivatives
+                            </p>
+                          )}
+                          {formData.licenseType === 'commercial-remix' && (
+                            <p className="text-xs text-gray-600 mt-1">
+                              ✓ Commercial use • ✓ Derivatives allowed • Revenue sharing
+                            </p>
+                          )}
+                          {formData.licenseType === 'custom' && (
+                            <div className="text-xs text-gray-600 mt-2 space-y-1">
+                              <p>Commercial Use: {formData.customCommercialUse ? '✓ Yes' : '✗ No'}</p>
+                              {formData.customCommercialUse && (
+                                <p className="ml-4">• Attribution: {formData.customCommercialAttribution ? 'Required' : 'Not required'}</p>
+                              )}
+                              <p>Derivatives: {formData.customDerivativesAllowed ? '✓ Allowed' : '✗ Not allowed'}</p>
+                              {formData.customDerivativesAllowed && (
+                                <>
+                                  <p className="ml-4">• Attribution: {formData.customDerivativesAttribution ? 'Required' : 'Not required'}</p>
+                                  <p className="ml-4">• Approval: {formData.customDerivativesApproval ? 'Required' : 'Not required'}</p>
+                                  <p className="ml-4">• Share-Alike: {formData.customDerivativesReciprocal ? 'Yes' : 'No'}</p>
+                                </>
+                              )}
+                              <p>Transferable: {formData.customTransferable ? '✓ Yes' : '✗ No'}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      {/* Minting Fee - Editable */}
-                      <div>
-                        <label className="block text-xs sm:text-sm font-semibold text-gray-600 mb-2">
-                          Minting Fee (IP tokens)
-                        </label>
-                        <input
-                          type="number"
-                          placeholder="Enter amount (IP tokens)"
-                          value={formData.licensePrice}
-                          onChange={(e) => updateFormData('licensePrice', e.target.value)}
-                          min="0"
-                          step="0.01"
-                          className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91]"
-                        />
-                      </div>
+                      {/* Minting Fee - Editable (not for custom) */}
+                      {formData.licenseType !== 'custom' && (
+                        <div>
+                          <label className="block text-xs sm:text-sm font-semibold text-gray-600 mb-2">
+                            Minting Fee (IP tokens)
+                          </label>
+                          <input
+                            type="number"
+                            placeholder="Enter amount (IP tokens)"
+                            value={formData.licensePrice}
+                            onChange={(e) => updateFormData('licensePrice', e.target.value)}
+                            min="0"
+                            step="0.01"
+                            className="w-full px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-lg text-sm sm:text-base text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#486B91]"
+                          />
+                        </div>
+                      )}
 
                       {/* Commercial Revenue Share - Editable (only for commercial-remix) */}
                       {formData.licenseType === 'commercial-remix' && (
@@ -697,10 +973,11 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
               )}
             </div>
 
-            {/* Progress Bar and Next Button - Fixed to wizard container */}
+            {/* Progress Bar and Navigation Buttons - Fixed to wizard container */}
             <div className="absolute bottom-0 left-0 right-0 bg-white border-t rounded-b-lg">
-              <div className="py-3 sm:py-4 px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-0 sm:justify-between">
-                <div className="flex items-center gap-3 sm:gap-4 flex-1">
+              <div className="py-3 sm:py-4 px-4 sm:px-8 lg:px-12">
+                {/* Progress Bar */}
+                <div className="flex items-center gap-3 sm:gap-4 mb-3">
                   <span className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">{currentStep} out of {totalSteps}</span>
                   <div className="flex-1 sm:flex-none sm:w-48 md:w-64 lg:w-80 h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
@@ -710,22 +987,47 @@ export default function RegisterPieceClient({ dict, lang }: RegisterPieceClientP
                   </div>
                 </div>
 
-                <button
-                  onClick={currentStep === totalSteps ? handleSubmit : handleNext}
-                  disabled={!isCurrentStepValid() || (currentStep === totalSteps && isRegistering)}
-                  className="w-full sm:w-auto px-6 py-2.5 sm:py-2 text-white rounded-full transition-colors font-medium text-sm sm:text-base cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300 flex items-center justify-center gap-2"
-                  style={{ backgroundColor: isCurrentStepValid() && !isRegistering ? PRIMARY_COLOR : undefined }}
-                  onMouseEnter={(e) => { if (isCurrentStepValid() && !isRegistering) e.currentTarget.style.backgroundColor = PRIMARY_COLOR_HOVER; }}
-                  onMouseLeave={(e) => { if (isCurrentStepValid() && !isRegistering) e.currentTarget.style.backgroundColor = PRIMARY_COLOR; }}
-                >
-                  {isRegistering && (
-                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                {/* Navigation Buttons */}
+                <div className="flex items-center justify-between gap-3">
+                  {/* Back Button */}
+                  <button
+                    onClick={handleBack}
+                    disabled={currentStep === 1 || isRegistering}
+                    className={`px-6 py-2.5 sm:py-2 rounded-full transition-colors font-medium text-sm sm:text-base cursor-pointer flex items-center justify-center gap-2 ${
+                      currentStep === 1 || isRegistering
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
-                  )}
-                  {currentStep === totalSteps ? (isRegistering ? 'Registering...' : 'Submit') : 'Next'}
-                </button>
+                    Back
+                  </button>
+
+                  {/* Next/Submit Button */}
+                  <button
+                    onClick={currentStep === totalSteps ? handleSubmit : handleNext}
+                    disabled={!isCurrentStepValid() || (currentStep === totalSteps && isRegistering)}
+                    className="flex-1 sm:flex-none px-6 py-2.5 sm:py-2 text-white rounded-full transition-colors font-medium text-sm sm:text-base cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300 flex items-center justify-center gap-2"
+                    style={{ backgroundColor: isCurrentStepValid() && !isRegistering ? PRIMARY_COLOR : undefined }}
+                    onMouseEnter={(e) => { if (isCurrentStepValid() && !isRegistering) e.currentTarget.style.backgroundColor = PRIMARY_COLOR_HOVER; }}
+                    onMouseLeave={(e) => { if (isCurrentStepValid() && !isRegistering) e.currentTarget.style.backgroundColor = PRIMARY_COLOR; }}
+                  >
+                    {isRegistering && (
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    )}
+                    {currentStep === totalSteps ? (isRegistering ? 'Registering...' : 'Submit') : 'Next'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
