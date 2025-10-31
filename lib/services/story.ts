@@ -372,7 +372,8 @@ export function prepareMetadata(pieceData: {
 export type PILLicenseType =
   | 'non-commercial' // Non-Commercial Social Remixing (Free, remixes allowed, no commercial use)
   | 'commercial-use' // Commercial Use (Paid, no remixes, commercial use allowed)
-  | 'commercial-remix'; // Commercial Remix (Paid, remixes allowed, revenue sharing)
+  | 'commercial-remix' // Commercial Remix (Paid, remixes allowed, revenue sharing)
+  | 'custom'; // Fully custom license with all parameters
 
 export interface PILLicenseConfig {
   type: PILLicenseType;
@@ -381,6 +382,41 @@ export interface PILLicenseConfig {
   // For commercial remix
   commercialRevShare?: number; // Percentage (0-100)
   currency?: Address; // Token address for payments
+}
+
+/**
+ * Custom PIL License Terms
+ * Complete configuration for fully custom licenses
+ */
+export interface CustomPILTerms {
+  // Transfer & Ownership
+  transferable?: boolean; // Can the license be transferred?
+
+  // Financial Parameters
+  defaultMintingFee?: string; // Fee in IP tokens (e.g., "1")
+  currency?: Address; // ERC20 token for payments
+  royaltyPolicy?: Address; // Royalty policy contract (default: LAP)
+
+  // Expiration
+  expiration?: bigint; // License expiration timestamp (0 = no expiration)
+
+  // Commercial Use
+  commercialUse?: boolean; // Allow commercial use?
+  commercialAttribution?: boolean; // Require attribution for commercial use?
+  commercialRevShare?: number; // Revenue share percentage (0-100)
+  commercialRevCeiling?: bigint; // Maximum revenue from commercial use
+  commercializerChecker?: Address; // Address to restrict commercial exploiters
+  commercializerCheckerData?: `0x${string}`; // Data for commercializer checker
+
+  // Derivatives
+  derivativesAllowed?: boolean; // Allow derivative works?
+  derivativesAttribution?: boolean; // Require attribution for derivatives?
+  derivativesApproval?: boolean; // Require approval before creating derivatives?
+  derivativesReciprocal?: boolean; // Must derivatives use same license terms?
+  derivativeRevCeiling?: bigint; // Maximum revenue from derivative works
+
+  // Off-chain Terms URI
+  uri?: string; // URI pointing to off-chain license terms
 }
 
 /**
@@ -490,6 +526,88 @@ export async function registerAndAttachPILTerms(
     };
   } catch (error) {
     console.error('Failed to register and attach PIL terms:', error);
+    throw error;
+  }
+}
+
+/**
+ * Register fully custom PIL terms and attach to IP Asset
+ * Use this when you need complete control over all license parameters
+ * @param client - Story Protocol client instance
+ * @param ipId - IP Asset ID
+ * @param customTerms - Complete custom PIL terms configuration
+ * @returns Transaction hash and license terms ID
+ */
+export async function registerCustomPILTerms(
+  client: StoryClient,
+  ipId: Address,
+  customTerms: CustomPILTerms
+): Promise<AttachLicenseTermsResult> {
+  try {
+    // Dynamic imports
+    const { parseEther, zeroAddress } = await import('viem');
+
+    // Default values for required fields
+    const defaultRoyaltyPolicy = '0xBe54FB168b3c982b7AaE60dB6CF75Bd8447b390E' as Address; // RoyaltyPolicyLAP
+    const defaultCurrency = '0x1514000000000000000000000000000000000000' as Address; // $IP token
+
+    // Build the complete license terms object
+    const licenseTerms = {
+      // Transfer & Ownership
+      transferable: customTerms.transferable ?? true,
+
+      // Financial Parameters
+      defaultMintingFee: customTerms.defaultMintingFee
+        ? parseEther(customTerms.defaultMintingFee)
+        : 0n,
+      currency: customTerms.currency || defaultCurrency,
+      royaltyPolicy: customTerms.royaltyPolicy || defaultRoyaltyPolicy,
+
+      // Expiration
+      expiration: customTerms.expiration ?? 0n,
+
+      // Commercial Use
+      commercialUse: customTerms.commercialUse ?? false,
+      commercialAttribution: customTerms.commercialAttribution ?? false,
+      commercialRevShare: customTerms.commercialRevShare ?? 0,
+      commercialRevCeiling: customTerms.commercialRevCeiling ?? 0n,
+      commercializerChecker: customTerms.commercializerChecker || zeroAddress,
+      commercializerCheckerData: customTerms.commercializerCheckerData || ('0x' as `0x${string}`),
+
+      // Derivatives
+      derivativesAllowed: customTerms.derivativesAllowed ?? false,
+      derivativesAttribution: customTerms.derivativesAttribution ?? false,
+      derivativesApproval: customTerms.derivativesApproval ?? false,
+      derivativesReciprocal: customTerms.derivativesReciprocal ?? false,
+      derivativeRevCeiling: customTerms.derivativeRevCeiling ?? 0n,
+
+      // Off-chain Terms
+      uri: customTerms.uri || '',
+    };
+
+    console.log('[Story] Registering custom PIL terms:', licenseTerms);
+
+    // Register and attach the custom terms
+    const response = await client.license.registerPilTermsAndAttach({
+      ipId,
+      licenseTermsData: [{ terms: licenseTerms }],
+    });
+
+    if (!response.txHash || !response.licenseTermsIds || response.licenseTermsIds.length === 0) {
+      throw new Error('Failed to register custom PIL terms: Missing response data');
+    }
+
+    console.log('[Story] Custom PIL terms registered:', {
+      txHash: response.txHash,
+      licenseTermsId: response.licenseTermsIds[0].toString(),
+    });
+
+    return {
+      txHash: response.txHash,
+      licenseTermsId: response.licenseTermsIds[0].toString(),
+    };
+  } catch (error) {
+    console.error('[Story] Failed to register custom PIL terms:', error);
     throw error;
   }
 }
