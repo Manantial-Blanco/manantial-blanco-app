@@ -1,14 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Search, X, ChevronDown } from 'lucide-react';
-import Link from 'next/link';
+import { Search, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { useRouter } from 'next/navigation';
 import { Dictionary, Locale } from '@/types';
 import { NavigationHeader } from '@/components/layout/NavigationHeader';
-import { useUserProfile, useUserEmail, useUserName } from '@/lib/services/reown';
 
 interface LandingUIProps {
   dict: Dictionary;
@@ -266,19 +264,14 @@ const TestimonialsCarousel = ({ testimonials }: { testimonials: Array<{ name: st
 export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
   const [showBanner, setShowBanner] = useState(true);
   const { open } = useAppKit();
-  const { address, isConnected } = useAppKitAccount();
+  const { isConnected } = useAppKitAccount();
   const router = useRouter();
-  
-  // Get user profile data using the ready-to-use hooks
-  const userProfile = useUserProfile();
-  const userEmail = useUserEmail();
-  const userName = useUserName();
 
 
 
-  const displayPieces = pieces.length > 0 
-    ? pieces 
-    : Array(8).fill(null).map((_, i) => ({
+  const displayPieces = pieces.length > 0
+    ? pieces
+    : Array(16).fill(null).map((_, i) => ({
         id: `placeholder-${i}`,
         title: 'Alebrije Alado',
         imageUrl: '/images/placeholder-art.png?width=2886',
@@ -476,7 +469,7 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
 
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
             {displayPieces.map((piece) => (
-              <Link key={piece.id} href={`/${lang}/piece/${piece.id}`} className="group">
+              <div key={piece.id} className="group relative cursor-pointer">
                 <div className="relative aspect-square w-full overflow-hidden rounded-md bg-secondary">
                   <Image
                     src={piece.imageUrl}
@@ -484,12 +477,34 @@ export default function LandingUI({ dict, lang, pieces = [] }: LandingUIProps) {
                     fill
                     className="object-contain group-hover:scale-105 transition-transform duration-300"
                   />
+                  {/* Remix Button Overlay */}
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // Save piece data to sessionStorage for remix page
+                        const pieceData = {
+                          id: piece.id,
+                          title: piece.title,
+                          imageUrl: piece.imageUrl,
+                          creatorName: piece.creatorName,
+                        };
+                        sessionStorage.setItem(`remix_parent_${piece.id}`, JSON.stringify(pieceData));
+                        router.push(`/${lang}/remix/${piece.id}`);
+                      }}
+                      className="px-4 py-2 bg-white text-black rounded-full font-semibold text-sm hover:bg-gray-200 transition-colors flex items-center gap-2 shadow-lg"
+                    >
+                      <Icon icon="remix" className="w-5 h-5" />
+                      Remix
+                    </button>
+                  </div>
                 </div>
                 <div className="mt-1 sm:mt-2">
                   <h4 className="font-semibold text-xs sm:text-sm truncate">{piece.title}</h4>
                   <p className="text-xs text-muted-foreground">por {piece.creatorName}</p>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 

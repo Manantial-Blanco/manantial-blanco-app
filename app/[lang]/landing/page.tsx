@@ -12,6 +12,7 @@ const FEATURED_WALLETS = [
   '0x6B7572a1712b27D2E76Bd9ef6533022693314d54',
   '0x7e764d0C7be74d548f4836D357a31D17B0A81fB9',
   '0x2842decf9baEb5ec76988d1261325329848522Ae',
+  '0xf4d588537576F6a140B208b1DC58F1d96af66d70',
 ];
 
 async function fetchStoryProtocolPieces(): Promise<Array<{
@@ -88,8 +89,8 @@ async function fetchStoryProtocolPieces(): Promise<Array<{
       }
     }
 
-    // Return first 8 pieces with images
-    return allPieces.slice(0, 8);
+    // Return first 16 pieces with images
+    return allPieces.slice(0, 16);
   } catch (error) {
     console.error('Error fetching Story Protocol pieces:', error);
     return [];
